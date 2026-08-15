@@ -269,12 +269,12 @@ window.SevaRoute = window.SevaRoute || {};
       }
     });
 
-    // 4. Translate Navigation Page Links
+    // 4. Translate Navigation Page Links (Strict Scope)
     const navLinks = [
-      { sel: 'a[href="index.html"] span, #tab-btn-all span', en: 'Executive Overview', hi: 'कार्यकारी अवलोकन' },
-      { sel: 'a[href="hospitals.html"] span, #tab-btn-hospitals span', en: 'Hospital Grid & Matrix', hi: 'अस्पताल ग्रिड व तालिका' },
-      { sel: 'a[href="map.html"] span, #tab-btn-map span', en: 'Emergency GIS Map', hi: 'आपातकालीन जीआईएस मानचित्र' },
-      { sel: 'a[href="telemetry.html"] span, #tab-btn-telemetry span', en: 'Telemetry & Storage', hi: 'टेलीमेट्री व ऑक्सीजन भंडारण' }
+      { sel: '.main-page-nav a[href="index.html"] span, .main-view-tab-nav #tab-btn-all span', en: 'Executive Overview', hi: 'कार्यकारी अवलोकन' },
+      { sel: '.main-page-nav a[href="hospitals.html"] span, .main-view-tab-nav #tab-btn-hospitals span', en: 'Hospital Grid & Matrix', hi: 'अस्पताल ग्रिड व तालिका' },
+      { sel: '.main-page-nav a[href="map.html"] span, .main-view-tab-nav #tab-btn-map span', en: 'Emergency GIS Map', hi: 'आपातकालीन जीआईएस मानचित्र' },
+      { sel: '.main-page-nav a[href="telemetry.html"] span, .main-view-tab-nav #tab-btn-telemetry span', en: 'Telemetry & Storage', hi: 'टेलीमेट्री व ऑक्सीजन भंडारण' }
     ];
 
     navLinks.forEach(item => {
