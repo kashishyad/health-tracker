@@ -34,7 +34,7 @@ window.SevaRoute = window.SevaRoute || {};
     ]
   };
 
-  // i18n Translations Dictionary
+  // i18n Translations Dictionary (Official MoHFW / NHM UP Hindi Terminology)
   const translations = {
     en: {
       siteSubtitle: 'Rural Health Infrastructure & Emergency Transit Visualizer',
@@ -67,40 +67,82 @@ window.SevaRoute = window.SevaRoute || {};
       dismissDiag: 'Dismiss Diagnostics',
       exportCsv: 'Export CSV Log',
       exportFhir: 'Export ABDM FHIR JSON',
-      printPdf: 'Print PDF Handover'
+      printPdf: 'Print PDF Handover',
+
+      // Navigation
+      navOverview: 'Executive Overview',
+      navHospitals: 'Hospital Grid & Matrix',
+      navMap: 'Emergency GIS Map',
+      navTelemetry: 'Telemetry & Storage',
+
+      // Vitals
+      vitalCriticalBeds: 'Critical ICU Surge',
+      vitalOxygenReserve: 'Oxygen Supply Reserve',
+      vitalSpecialists: 'Specialist Surgeons On Duty',
+      vitalFleetActive: '108 Emergency Fleet Active',
+
+      // Form Labels
+      patientNameLabel: 'Patient Name / Emergency Caller',
+      triagePriorityLabel: 'Clinical Priority (Triage Category)',
+      pickupLocationLabel: 'Pickup Village / GPS Landmark',
+      destHospitalLabel: 'Destination Hospital Allocation',
+      ambulanceTypeLabel: 'Ambulance Fleet Unit Type',
+      abhaIdLabel: 'ABHA ID (Ayushman Bharat Health Account)',
+      clinicalNotesLabel: 'Emergency Clinical Notes & Vital Telemetry'
     },
     hi: {
-      siteSubtitle: 'ग्रामीण स्वास्थ्य अवसंरचना एवं आपातकालीन पारगमन ट्रैकर',
+      siteSubtitle: 'ग्रामीण स्वास्थ्य अवसंरचना एवं 108 आपातकालीन प्रेषण कमान केंद्र',
       fieldContrast: 'उच्च-विषमता मोड (धूप हेतु)',
       telemetryLogBtn: 'टेलीमेट्री लॉग',
-      emergencySosBtn: '108 आपातकालीन एसओएस',
-      districtSector: 'जिला क्षेत्र:',
-      allDistricts: 'समस्त यूपी जिले (12 केंद्र)',
-      gkpSector: 'गोरखपुर क्षेत्र (6 केंद्र)',
-      jaunpurSector: 'जौनपुर जिला क्षेत्र (6 केंद्र)',
-      liveFeed: 'लाइव आपातकालीन डिस्पैच फ़ीड',
-      allStatuses: 'सभी स्थितियां',
-      criticalAlerts: 'गंभीर अलर्ट (Critical)',
-      cautionLowO2: 'चेतावनी / कम O2 (Warning)',
-      readyAvailable: 'उपलब्ध एवं तैयार (Ready)',
-      hospitalsTitle: 'अस्पताल एवं स्वास्थ्य केंद्र',
-      matrixView: 'संक्षिप्त तालिका दृश्य',
-      cardsView: 'विस्तृत कार्ड दृश्य',
-      searchPlaceholder: 'अस्पताल, पिन कोड, डॉक्टर या औषधि खोजें (उदा: एंटीवेनम, आईसीयू)...',
-      allAssets: 'सभी चिकित्सा संसाधन',
-      icuAvail5: 'आईसीयू बेड > 5 उपलब्ध',
-      o2Avail12: 'ऑक्सीजन आपूर्ति > 12 घंटे',
-      surgeonsAvail: 'ड्यूटी पर विशेषज्ञ डॉक्टर',
-      antivenomAvail: 'एंटीवेनम स्टॉक उपलब्ध (> 5 शीशियां)',
-      dispatchModalTitle: '108 आपातकालीन रूट प्रेषण एवं आईसीयू बेड लॉक',
-      confirmDispatch: '108 प्रेषण की पुष्टि करें एवं बेड लॉक करें',
-      audioToggleOn: 'ध्वनि अलार्म: चालू',
-      audioToggleOff: 'ध्वनि अलार्म: बंद',
-      telemetryTitle: 'यूपी ईस्ट टेलीमेट्री एवं उपग्रह निदान',
-      dismissDiag: 'निदान बंद करें',
-      exportCsv: 'सीएसवी लॉग डाउनलोड',
-      exportFhir: 'एबीडीएम एफएचआईआर जेसन डाउनलोड',
-      printPdf: 'पीडीएफ प्रिंट हैंडओवर'
+      emergencySosBtn: '108 आपातकालीन एसओएस प्रेषण',
+      districtSector: 'जिला स्वास्थ्य कॉरिडोर:',
+      allDistricts: 'समस्त यूपी जिले (12 चिकित्सा केंद्र)',
+      gkpSector: 'गोरखपुर प्रभाग (6 चिकित्सा केंद्र)',
+      jaunpurSector: 'जौनपुर जिला (6 चिकित्सा केंद्र)',
+      liveFeed: 'लाइव 108 आपातकालीन प्रेषण धारा',
+      allStatuses: 'समस्त स्थितियां',
+      criticalAlerts: 'अति-गंभीर आपातकाल (Critical)',
+      cautionLowO2: 'सचेत / कम ऑक्सीजन (Warning)',
+      readyAvailable: 'उपलब्ध एवं सुरक्षित (Stable)',
+      hospitalsTitle: 'अस्पताल एवं सामुदायिक स्वास्थ्य केंद्र',
+      matrixView: 'नियंत्रण कक्ष तालिका',
+      cardsView: 'विस्तृत ग्रिड दृश्य',
+      searchPlaceholder: 'अस्पताल, डॉक्टर, जिला या चिकित्सा संसाधन खोजें (उदा: एंटीवेनम, आईसीयू)...',
+      allAssets: 'समस्त चिकित्सा संसाधन',
+      icuAvail5: 'आईसीयू बेड उपलब्ध (> 5)',
+      o2Avail12: 'ऑक्सीजन बैकअप (> 12 घंटे)',
+      surgeonsAvail: 'ड्यूटी पर विशेषज्ञ शल्य चिकित्सक',
+      antivenomAvail: 'एंटीवेनम सर्पदंश औषधि स्टॉक (> 5 शीशियां)',
+      dispatchModalTitle: '108 आपातकालीन एम्बुलेंस प्रेषण एवं आईसीयू बेड आरक्षण',
+      confirmDispatch: '108 प्रेषण की पुष्टि करें एवं आईसीयू बेड आरक्षित करें',
+      audioToggleOn: 'ध्वनि चेतावनी: चालू',
+      audioToggleOff: 'ध्वनि चेतावनी: बंद',
+      telemetryTitle: 'पूर्वी यूपी उपग्रह टेलीमेट्री एवं कोल्ड-चेन निदान',
+      dismissDiag: 'निदान बिंदु बंद करें',
+      exportCsv: 'सीएसवी डेटा डाउनलोड',
+      exportFhir: 'आयुष्मान भारत FHIR JSON डाउनलोड',
+      printPdf: 'पीडीएफ प्रिंट प्रतिवेदन',
+
+      // Navigation
+      navOverview: 'कार्यकारी अवलोकन',
+      navHospitals: 'अस्पताल ग्रिड व तालिका',
+      navMap: 'आपातकालीन जीआईएस मानचित्र',
+      navTelemetry: 'टेलीमेट्री व ऑक्सीजन भंडारण',
+
+      // Vitals
+      vitalCriticalBeds: 'अति-गंभीर आईसीयू दबाव',
+      vitalOxygenReserve: 'ऑक्सीजन आपूर्ति भंडार',
+      vitalSpecialists: 'ड्यूटी पर विशेषज्ञ शल्य चिकित्सक',
+      vitalFleetActive: '108 सक्रिय आपातकालीन बेड़ा',
+
+      // Form Labels
+      patientNameLabel: 'रोगी का नाम / आपातकालीन कॉलर',
+      triagePriorityLabel: 'चिकित्सकीय प्राथमिकता (ट्राएज श्रेणी)',
+      pickupLocationLabel: 'पिकअप ग्राम / जीपीएस लैंडमार्क',
+      destHospitalLabel: 'आवंटित गंतव्य अस्पताल',
+      ambulanceTypeLabel: 'एम्बुलेंस बेड़ा इकाई प्रकार',
+      abhaIdLabel: 'आभा आईडी (आयुष्मान भारत स्वास्थ्य खाता)',
+      clinicalNotesLabel: 'आपातकालीन नैदानिक टिप्पणियां व वाइटल्स'
     }
   };
 
