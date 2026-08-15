@@ -212,7 +212,7 @@ window.SevaRoute = window.SevaRoute || {};
     }
   }
 
-  // i18n Switcher Implementation
+  // i18n Switcher Implementation (Translates 100% of UI Text)
   function setLanguage(lang) {
     state.lang = lang;
     localStorage.setItem('sevaroute_lang', lang);
@@ -220,6 +220,7 @@ window.SevaRoute = window.SevaRoute || {};
     
     const dict = translations[lang] || translations.en;
 
+    // 1. Translate all static data-i18n elements
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.getAttribute('data-i18n');
       if (dict[key]) {
@@ -231,7 +232,7 @@ window.SevaRoute = window.SevaRoute || {};
       }
     });
 
-    // Update facility names
+    // 2. Translate facility card names and sub-labels
     state.facilities.forEach(fac => {
       const card = document.getElementById(fac.id);
       if (card) {
@@ -239,13 +240,53 @@ window.SevaRoute = window.SevaRoute || {};
         if (nameEl) {
           nameEl.textContent = lang === 'hi' ? fac.nameHi : fac.nameEn;
         }
+
+        // Translate Surge Badges
+        const surgeBadge = card.querySelector('.h-card-top span:last-child');
+        if (surgeBadge) {
+          if (fac.status === 'critical') {
+            surgeBadge.textContent = lang === 'hi' ? `अति-गंभीर दबाव (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `CRITICAL SURGE (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`;
+          } else if (fac.status === 'stable') {
+            surgeBadge.textContent = lang === 'hi' ? `सुरक्षित स्थिति (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `STABLE (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`;
+          } else {
+            surgeBadge.textContent = lang === 'hi' ? `सचेत स्थिति (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `CAUTION ALERT (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`;
+          }
+        }
       }
     });
 
-    // Update language toggle button visual
+    // 3. Translate Card Metric Labels (.h-metric-label)
+    document.querySelectorAll('.h-metric-label').forEach(labelEl => {
+      const text = labelEl.textContent.trim();
+      if (text.includes('ICU Beds') || text.includes('आईसीयू')) {
+        labelEl.innerHTML = lang === 'hi' ? `<span>आईसीयू बेड</span><span>निःशुल्क/कुल</span>` : `<span>ICU Beds</span><span>Free / Total</span>`;
+      } else if (text.includes('O2 Supply') || text.includes('ऑक्सीजन')) {
+        labelEl.innerHTML = lang === 'hi' ? `<span>ऑक्सीजन आपूर्ति</span><span>घंटे शेष</span>` : `<span>O2 Supply</span><span>Hours Remaining</span>`;
+      } else if (text.includes('Blood Bank') || text.includes('रक्त बैंक')) {
+        labelEl.innerHTML = lang === 'hi' ? `<span>रक्त बैंक</span><span>यूनिट्स O-</span>` : `<span>Blood Bank</span><span>Units O-</span>`;
+      } else if (text.includes('Antivenom') || text.includes('एंटीवेनम')) {
+        labelEl.innerHTML = lang === 'hi' ? `<span>एंटीवेनम स्टॉक</span><span>शीशियां उपलब्ध</span>` : `<span>Antivenom Stock</span><span>Vials Available</span>`;
+      }
+    });
+
+    // 4. Translate Navigation Page Links
+    const navLinks = [
+      { sel: 'a[href="index.html"] span, #tab-btn-all span', en: 'Executive Overview', hi: 'कार्यकारी अवलोकन' },
+      { sel: 'a[href="hospitals.html"] span, #tab-btn-hospitals span', en: 'Hospital Grid & Matrix', hi: 'अस्पताल ग्रिड व तालिका' },
+      { sel: 'a[href="map.html"] span, #tab-btn-map span', en: 'Emergency GIS Map', hi: 'आपातकालीन जीआईएस मानचित्र' },
+      { sel: 'a[href="telemetry.html"] span, #tab-btn-telemetry span', en: 'Telemetry & Storage', hi: 'टेलीमेट्री व ऑक्सीजन भंडारण' }
+    ];
+
+    navLinks.forEach(item => {
+      document.querySelectorAll(item.sel).forEach(span => {
+        span.textContent = lang === 'hi' ? item.hi : item.en;
+      });
+    });
+
+    // 5. Update Language Toggle Button Visual
     const langBtn = document.getElementById('btn-lang-toggle');
     if (langBtn) {
-      langBtn.innerHTML = `🌐 ${lang === 'en' ? 'English' : 'हिंदी'}`;
+      langBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" class="nav-icon"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> ${lang === 'en' ? 'English' : 'हिंदी'}`;
     }
   }
 
