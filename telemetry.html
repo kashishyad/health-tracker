@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SevaRoute - Regional Telemetry, LMO Oxygen Tanks & ABDM Sat-Link Diagnostics.">
+  <title>SevaRoute - Telemetry, Cryo Oxygen Tanks &amp; ABDM Diagnostics</title>
+  <script>
+    (function() {
+      if (localStorage.getItem('sevaroute_theme') === 'light') {
+        document.documentElement.classList.add('light-theme-active');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <input type="checkbox" id="modal-dispatch" class="modal-checkbox">
+  <input type="checkbox" id="modal-telemetry" class="modal-checkbox">
+  <input type="checkbox" id="toggle-emergency-contrast" class="modal-checkbox">
+
+  <!-- Diagnostics Modal -->
+  <div class="modal-backdrop modal-telemetry-wrap" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="section-icon" style="background: rgba(6,182,212,0.15); color: var(--brand-cyan);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">UP East Sat-Link Diagnostics</h3>
+            <p class="text-mono-xs text-muted">ABDM Hub &bull; Jaunpur &amp; Gorakhpur IoT</p>
+          </div>
+        </div>
+        <label for="modal-telemetry" class="modal-close-btn">&times;</label>
+      </div>
+
+      <div id="telemetry-severity-filters" class="telemetry-severity-filters">
+        <button type="button" class="tfilter-btn active" data-severity="all">ALL (5)</button>
+        <button type="button" class="tfilter-btn" data-severity="ok">[OK]</button>
+        <button type="button" class="tfilter-btn" data-severity="warn">[WARN]</button>
+        <button type="button" class="tfilter-btn" data-severity="alert">[ALERT]</button>
+      </div>
+
+      <div class="telemetry-log-list">
+        <div class="telemetry-log-entry status-ok"><div class="tlog-status">[OK] ABDM FHIR DATA PIPELINE</div><div class="tlog-detail">Latency 38ms &bull; AES-256 &bull; 12 Nodes Online</div></div>
+        <div class="telemetry-log-entry status-warn"><div class="tlog-status">[WARN] IOT OXYGEN PRESSURE #09</div><div class="tlog-detail">Mariahu CHC Manifold at 2.8 Bar &bull; Reserve bank 02 engaged</div></div>
+      </div>
+
+      <div class="telemetry-modal-footer">
+        <div class="telemetry-modal-actions">
+          <button type="button" id="btn-export-csv" class="action-btn-sm saffron-btn">Export CSV</button>
+          <button type="button" id="btn-export-fhir" class="action-btn-sm route-btn">Export ABDM FHIR JSON</button>
+          <button type="button" id="btn-export-pdf" class="action-btn-sm print-pdf-btn">Print PDF Handover</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <header class="national-topbar">
+      <div class="national-badges">
+        <span class="gov-emblem-tag">
+          <svg class="indian-flag-icon" viewBox="0 0 30 20" aria-label="Indian National Flag">
+            <rect width="30" height="6.67" y="0" fill="#FF9933"/>
+            <rect width="30" height="6.67" y="6.67" fill="#FFFFFF"/>
+            <rect width="30" height="6.67" y="13.33" fill="#138808"/>
+            <circle cx="15" cy="10" r="2.8" fill="none" stroke="#000080" stroke-width="0.5"/>
+            <circle cx="15" cy="10" r="0.4" fill="#000080"/>
+            <g stroke="#000080" stroke-width="0.25">
+              <line x1="15" y1="7.2" x2="15" y2="12.8"/>
+              <line x1="12.2" y1="10" x2="17.8" y2="10"/>
+              <line x1="13.02" y1="8.02" x2="16.98" y2="11.98"/>
+              <line x1="13.02" y1="11.98" x2="16.98" y2="8.02"/>
+            </g>
+          </svg>
+          NHM &bull; MoHFW
+        </span>
+        <span class="abdm-node-badge">ABDM: UP-EAST-9940</span>
+        <span class="up-grid-badge">Gorakhpur &bull; Jaunpur Sector</span>
+      </div>
+      <div class="live-sat-telemetry">
+        <span class="live-clock-text" style="font-family:var(--font-mono); color:var(--brand-cyan); font-weight:700;">--:--:-- IST</span>
+        <span class="sat-indicator"><span class="sat-spinner"></span>NavIC 12/12 LOCKED</span>
+      </div>
+    </header>
+
+    <header class="main-header">
+      <div class="brand-section">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 7v6"/><path d="M9 10h6"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Seva<span class="brand-accent">Route</span> <span class="brand-hindi text-muted">| सेवारूट</span></h1>
+          <div class="brand-subtitle">Regional Telemetry, LMO Oxygen Tanks &amp; Diagnostics</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> English
+        </button>
+        <label for="toggle-emergency-contrast" class="contrast-toggle-label">Field Contrast</label>
+        <label for="modal-telemetry" class="modal-trigger-btn">Diagnostics Log</label>
+      </div>
+    </header>
+
+    <!-- Navigation Links -->
+    <nav class="main-page-nav" aria-label="Main Page Navigation">
+      <a href="index.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Executive Overview
+      </a>
+      <a href="hospitals.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 10h6"/><path d="M12 7v6"/></svg> Hospital Grid &amp; Matrix
+      </a>
+      <a href="map.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg> Emergency GIS Map
+      </a>
+      <a href="telemetry.html" class="page-link-btn active">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Telemetry &amp; Storage
+      </a>
+    </nav>
+
+    <!-- Cryogenic Tanks & Diagnostic Hub Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 16px;">
+
+      <!-- LMO Cryo Tanks Card -->
+      <div class="oxygen-storage-card">
+        <div class="section-title-wrap">
+          <div class="section-icon" style="color: var(--brand-cyan);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l2 6H4z"/><path d="M4 9v10a2 2 0 0 1 2 2h12a2 2 0 0 1 2-2V9"/><line x1="10" x2="14" y1="13" y2="13"/></svg>
+          </div>
+          <div>
+            <h3 class="section-title">Regional LMO Cryo Storage Tanks</h3>
+            <span class="text-mono-xs text-muted">Liquid Oxygen &amp; Pressure Sensors</span>
+          </div>
+        </div>
+
+        <div class="cryo-tanks-grid" style="grid-template-columns: 1fr 1fr; margin-top: 16px;">
+          <div class="cryo-tank-module">
+            <div class="tank-visual" role="img"><div class="tank-liquid crit-liquid" style="height: 22%;"></div></div>
+            <div class="tank-meta">
+              <span class="tank-title">Jaunpur Civil Tank</span>
+              <span class="tank-pct text-critical">22% Full</span>
+              <span class="tank-pressure text-mono-xs">Press: 2.3 Bar</span>
+            </div>
+          </div>
+
+          <div class="cryo-tank-module">
+            <div class="tank-visual" role="img"><div class="tank-liquid" style="height: 88%;"></div></div>
+            <div class="tank-meta">
+              <span class="tank-title">Shahganj Cryo Tank</span>
+              <span class="tank-pct text-stable">88% Full</span>
+              <span class="tank-pressure text-mono-xs">Press: 4.9 Bar</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABDM Diagnostics Card -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 24px;">
+        <div class="section-title-wrap" style="margin-bottom: 16px;">
+          <div class="section-icon" style="color: var(--brand-cyan);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <div>
+            <h3 class="section-title">ABDM Sat-Link &amp; Cold-Chain Log</h3>
+            <span class="text-mono-xs text-muted">12 Node Diagnostic Stream</span>
+          </div>
+        </div>
+
+        <div class="telemetry-log-list" style="max-height: 280px; overflow-y: auto;">
+          <div class="telemetry-log-entry status-ok"><div class="tlog-status">[OK] ABDM FHIR PIPELINE (JAUNPUR + GORAKHPUR)</div><div class="tlog-detail">Latency: 38ms &bull; 2,480 pkt/s &bull; All 12 nodes online</div></div>
+          <div class="telemetry-log-entry status-warn"><div class="tlog-status">[WARN] IOT OXYGEN PRESSURE #09 (MARIAHU CHC)</div><div class="tlog-detail">Pressure 2.8 Bar &bull; Reserve bank engaged</div></div>
+          <div class="telemetry-log-entry status-alert"><div class="tlog-status">[ALERT] GOMTI RIVER CAUSEWAY FLOOD ALERT</div><div class="tlog-detail">Baksha Sector flood warning &bull; 4x4 ambulance dispatched</div></div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+          <button type="button" id="btn-export-csv" class="action-btn-sm saffron-btn">Export CSV Log</button>
+          <button type="button" id="btn-export-fhir" class="action-btn-sm route-btn">Export ABDM FHIR JSON</button>
+          <button type="button" id="btn-export-pdf" class="action-btn-sm print-pdf-btn">Print PDF Handover</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Minimal Single-Line Footer -->
+    <footer class="app-minimal-footer" aria-label="Universal Site Footer">
+      <span>&copy; 2026 SevaRoute &bull; National Health Mission (NHM UP)</span>
+      <span class="footer-node">ABDM NODE: IN-UP-EAST-9940</span>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/telemetrySim.js"></script>
+  <script src="js/dispatchEngine.js"></script>
+  <script src="js/searchFilter.js"></script>
+  <script src="js/mapInteractivity.js"></script>
+  <script src="js/exportEngine.js"></script>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SevaRoute - Real-World Emergency GIS Tactical Transit Command Center across Gorakhpur and Jaunpur UP.">
+  <title>SevaRoute - Tactical GIS Emergency Command Center</title>
+  <script>
+    (function() {
+      if (localStorage.getItem('sevaroute_theme') === 'light') {
+        document.documentElement.classList.add('light-theme-active');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <input type="checkbox" id="modal-dispatch" class="modal-checkbox">
+  <input type="checkbox" id="modal-telemetry" class="modal-checkbox">
+  <input type="checkbox" id="toggle-emergency-contrast" class="modal-checkbox">
+
+  <!-- 108 SOS Dispatch Modal -->
+  <div class="modal-backdrop modal-dispatch-wrap" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="section-icon" style="background: var(--status-critical-bg); color: var(--status-critical);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">108 Emergency Dispatch &amp; Bed Lock</h3>
+          </div>
+        </div>
+        <label for="modal-dispatch" class="modal-close-btn">&times;</label>
+      </div>
+      <form class="modal-form" onsubmit="return false;">
+        <div class="form-group-grid">
+          <div class="form-field"><label>Patient Name</label><input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind"></div>
+          <div class="form-field"><label>Destination</label><select id="dest-hospital" class="form-select"><option value="sdh-shahganj">SDH Shahganj (14 Free)</option></select></div>
+        </div>
+        <div class="dispatch-actions">
+          <button type="button" class="dispatch-submit-btn">CONFIRM 108 DISPATCH</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <header class="national-topbar">
+      <div class="national-badges">
+        <span class="gov-emblem-tag">
+          <svg class="indian-flag-icon" viewBox="0 0 30 20" aria-label="Indian National Flag">
+            <rect width="30" height="6.67" y="0" fill="#FF9933"/>
+            <rect width="30" height="6.67" y="6.67" fill="#FFFFFF"/>
+            <rect width="30" height="6.67" y="13.33" fill="#138808"/>
+            <circle cx="15" cy="10" r="2.8" fill="none" stroke="#000080" stroke-width="0.5"/>
+            <circle cx="15" cy="10" r="0.4" fill="#000080"/>
+          </svg>
+          NHM &bull; MoHFW
+        </span>
+        <span class="abdm-node-badge">ABDM: UP-EAST-9940</span>
+        <span class="up-grid-badge">Gorakhpur &bull; Jaunpur Corridor</span>
+      </div>
+      <div class="live-sat-telemetry">
+        <span class="live-clock-text" style="font-family:var(--font-mono); color:var(--brand-cyan); font-weight:700;">--:--:-- IST</span>
+        <span class="sat-indicator"><span class="sat-spinner"></span>NavIC 12/12 LOCKED</span>
+      </div>
+    </header>
+
+    <header class="main-header">
+      <div class="brand-section">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 7v6"/><path d="M9 10h6"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Seva<span class="brand-accent">Route</span> <span class="brand-hindi text-muted">| सेवारूट</span></h1>
+          <div class="brand-subtitle">Tactical GIS Emergency Command Center</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> English
+        </button>
+        <label for="toggle-emergency-contrast" class="contrast-toggle-label">Field Contrast</label>
+        <label for="modal-dispatch" class="sos-call-btn">108 SOS DISPATCH</label>
+      </div>
+    </header>
+
+    <!-- Navigation Links -->
+    <nav class="main-page-nav" aria-label="Main Page Navigation">
+      <a href="index.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Executive Overview
+      </a>
+      <a href="hospitals.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 10h6"/><path d="M12 7v6"/></svg> Hospital Grid &amp; Matrix
+      </a>
+      <a href="map.html" class="page-link-btn active">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg> Emergency GIS Map
+      </a>
+      <a href="telemetry.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Telemetry &amp; Storage
+      </a>
+    </nav>
+
+    <!-- GIS Map & Incident Stream Grid -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-top: 16px;">
+
+      <!-- Full-Width Tactical GIS Command Card -->
+      <div class="map-visualizer-card">
+        <div class="section-title-wrap" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="section-icon" style="color: var(--brand-saffron);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+            </div>
+            <div>
+              <h3 class="section-title">Tactical GIS Map &bull; Gorakhpur &amp; Jaunpur Grid</h3>
+              <span class="text-mono-xs text-muted">Live Hospital HUD Cards &bull; Active 108 Fleet Routes</span>
+            </div>
+          </div>
+
+          <!-- Tactical HUD Metrics Bar -->
+          <div style="display:flex; gap:12px; background:rgba(11,17,32,0.8); padding:6px 14px; border-radius:var(--radius-sm); border:1px solid var(--border-subtle); font-family:var(--font-mono); font-size:0.75rem;">
+            <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y1="17"/></svg> <strong class="text-critical">4 Surges</strong></span>
+            <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg> <strong class="text-stable">32 ICU Free</strong></span>
+            <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l2 6H4z"/><path d="M4 9v10a2 2 0 0 1 2 2h12a2 2 0 0 1 2-2V9"/><line x1="10" y1="13" x2="14" y2="13"/></svg> <strong class="text-warning">28.4 kL O2</strong></span>
+            <span style="display:inline-flex; align-items:center; gap:4px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> <strong style="color:var(--brand-cyan);">46 Fleet Active</strong></span>
+          </div>
+        </div>
+
+        <!-- Real Leaflet Interactive GIS Map Container -->
+        <div id="gis-leaflet-map" style="height: 500px; width: 100%; border-radius: var(--radius-md); overflow: hidden; margin-top: 14px; border: 1px solid var(--border-subtle);"></div>
+
+        <div class="map-legend">
+          <span class="legend-item"><span class="legend-line" style="background: var(--status-critical);"></span><span>Critical Surge Red Zone</span></span>
+          <span class="legend-item"><span class="legend-line" style="background: var(--status-warning);"></span><span>Caution Warning Zone</span></span>
+          <span class="legend-item"><span class="legend-line" style="background: var(--status-stable);"></span><span>Stable Ready Zone</span></span>
+          <span class="legend-item"><span class="legend-line" style="background: var(--brand-saffron);"></span><span>NH-31 &bull; NH-28 Corridors</span></span>
+        </div>
+      </div>
+
+      <!-- Active Triage Queue Sidebar -->
+      <div class="incident-stream-card">
+        <div class="section-title-wrap">
+          <div class="section-icon" style="color: var(--status-critical);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+          </div>
+          <div>
+            <h3 class="section-title">Emergency Dispatch Queue</h3>
+            <span class="text-mono-xs text-muted">Active Triage Stream</span>
+          </div>
+        </div>
+
+        <div class="incidents-list">
+          <div class="incident-item p1-critical">
+            <div class="inc-top"><span class="inc-priority-tag p1">P1 CRITICAL &bull; NH-31</span><span class="inc-time text-mono-xs">1m ago</span></div>
+            <p class="inc-desc">Highway collision near Shahganj &bull; 108 ALS #21 En-route</p>
+            <div class="inc-route-info"><span>To: <strong>Jaunpur Civil</strong></span><span class="inc-eta">ETA 5m</span></div>
+          </div>
+
+          <div class="incident-item p1-critical">
+            <div class="inc-top"><span class="inc-priority-tag p1">P1 MATERNAL</span><span class="inc-time text-mono-xs">6m ago</span></div>
+            <p class="inc-desc">Eclampsia transfer from Baksha PHC</p>
+            <div class="inc-route-info"><span>To: <strong>Jaunpur Women</strong></span><span class="inc-eta">ETA 12m</span></div>
+          </div>
+
+          <div class="incident-item p2-warning">
+            <div class="inc-top"><span class="inc-priority-tag p2">P2 SNAKEBITE</span><span class="inc-time text-mono-xs">10m ago</span></div>
+            <p class="inc-desc">Krait envenomation &bull; Drone drop active</p>
+            <div class="inc-route-info"><span>To: <strong>Kusumhi PHC</strong></span><span class="inc-eta">Drone 8m</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Minimal Single-Line Footer -->
+    <footer class="app-minimal-footer" aria-label="Universal Site Footer">
+      <span>&copy; 2026 SevaRoute &bull; National Health Mission (NHM UP)</span>
+      <span class="footer-node">ABDM NODE: IN-UP-EAST-9940</span>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/telemetrySim.js"></script>
+  <script src="js/dispatchEngine.js"></script>
+  <script src="js/searchFilter.js"></script>
+  <script src="js/mapInteractivity.js"></script>
+  <script src="js/exportEngine.js"></script>
+</body>
+</html>

@@ -3,1971 +3,221 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="SevaRoute - Rural Health Infrastructure Tracker & Emergency Routing System for Tier-3 Cities and Villages. Real-time indicators for ICU bed counts, oxygen storage levels, active duty doctors across Gorakhpur and Jaunpur UP.">
-  <meta name="keywords" content="SevaRoute, Jaunpur Hospital, Gorakhpur Civil, Rural Health UP, 108 Ambulance, ICU Bed Tracker, Oxygen Telemetry, Indian Healthcare">
-  <meta name="author" content="National Digital Health Infrastructure Hub">
-  <title>🚑 SevaRoute - Rural Health Infrastructure Tracker | UP Emergency Grid (Gorakhpur & Jaunpur)</title>
+  <meta name="description" content="SevaRoute - Executive Regional Health Infrastructure Tracker for Gorakhpur and Jaunpur UP.">
+  <title>SevaRoute - Executive Overview | Rural Health Grid</title>
+  <script>
+    (function() {
+      if (localStorage.getItem('sevaroute_theme') === 'light') {
+        document.documentElement.classList.add('light-theme-active');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- =====================================================================
-       PURE CSS MODAL & TOGGLE INPUTS (No JS Required - Powered by CSS :checked)
-       ===================================================================== -->
+  <!-- Modals & Radios -->
   <input type="checkbox" id="modal-dispatch" class="modal-checkbox">
   <input type="checkbox" id="modal-telemetry" class="modal-checkbox">
   <input type="checkbox" id="toggle-emergency-contrast" class="modal-checkbox">
 
-  <!-- =====================================================================
-       CORRIDOR SWITCHER INPUTS (Pure CSS Sibling Radio Selectors)
-       ===================================================================== -->
-  <input type="radio" name="district-corridor-filter" id="corridor-all" class="corridor-radio" checked>
-  <input type="radio" name="district-corridor-filter" id="corridor-gkp" class="corridor-radio">
-  <input type="radio" name="district-corridor-filter" id="corridor-jaunpur" class="corridor-radio">
+  <!-- 108 SOS Dispatch Modal -->
+  <div class="modal-backdrop modal-dispatch-wrap" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="section-icon" style="background: var(--status-critical-bg); color: var(--status-critical);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">108 Emergency Dispatch &amp; Bed Lock</h3>
+            <p class="text-mono-xs text-muted">UP East 108 Network &bull; Gorakhpur &amp; Jaunpur</p>
+          </div>
+        </div>
+        <label for="modal-dispatch" class="modal-close-btn">&times;</label>
+      </div>
+      <form class="modal-form" onsubmit="return false;">
+        <div class="form-group-grid">
+          <div class="form-field"><label>Patient Name</label><input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind"></div>
+          <div class="form-field"><label>Priority</label><select id="triage-level" class="form-select"><option value="p1">P1 - Immediate Threat</option><option value="p2">P2 - Urgent</option></select></div>
+          <div class="form-field"><label>Pickup Village</label><input type="text" id="pickup-village" class="form-input" placeholder="Village Name, Post, Landmark"></div>
+          <div class="form-field"><label>Destination Hospital</label><select id="dest-hospital" class="form-select"><option value="sdh-shahganj">SDH Shahganj (14 ICU Free)</option><option value="dch-jaunpur">Jaunpur Civil (3 Free)</option></select></div>
+          <div class="form-field"><label>Ambulance Type</label><select id="ambulance-type" class="form-select"><option value="als">ALS Ventilator Ambulance</option><option value="4x4">4x4 Heavy Rural</option></select></div>
+          <div class="form-field"><label>ABHA ID</label><input type="text" id="abha-id" class="form-input" placeholder="14-digit ABHA ID (optional)"></div>
+        </div>
+        <div class="dispatch-actions">
+          <button type="button" class="dispatch-submit-btn">CONFIRM 108 DISPATCH &amp; LOCK ICU BED</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <!-- =====================================================================
-       MAIN APP CONTAINER
-       ===================================================================== -->
   <div class="app-container">
 
-    <!-- National Telemetry & Governance Top Bar -->
+    <!-- Header & Navigation -->
     <header class="national-topbar">
       <div class="national-badges">
         <span class="gov-emblem-tag">
-          <span class="flag-strip">
-            <span></span><span></span><span></span>
-          </span>
-          National Health Mission (NHM) &bull; MoHFW
+          <svg class="indian-flag-icon" viewBox="0 0 30 20" aria-label="Indian National Flag">
+            <rect width="30" height="6.67" y="0" fill="#FF9933"/>
+            <rect width="30" height="6.67" y="6.67" fill="#FFFFFF"/>
+            <rect width="30" height="6.67" y="13.33" fill="#138808"/>
+            <circle cx="15" cy="10" r="2.8" fill="none" stroke="#000080" stroke-width="0.5"/>
+            <circle cx="15" cy="10" r="0.4" fill="#000080"/>
+            <g stroke="#000080" stroke-width="0.25">
+              <line x1="15" y1="7.2" x2="15" y2="12.8"/>
+              <line x1="12.2" y1="10" x2="17.8" y2="10"/>
+              <line x1="13.02" y1="8.02" x2="16.98" y2="11.98"/>
+              <line x1="13.02" y1="11.98" x2="16.98" y2="8.02"/>
+            </g>
+          </svg>
+          NHM &bull; MoHFW
         </span>
-        <span class="abdm-node-badge">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          ABDM NODE: IN-UP-EAST-9940
-        </span>
-        <span class="up-grid-badge">
-          📍 UP East Corridor: Gorakhpur &bull; Jaunpur
-        </span>
-        <span class="tier3-tag">Tier-3 & Gram Panchayat Grid</span>
+        <span class="abdm-node-badge">ABDM: UP-EAST-9940</span>
+        <span class="up-grid-badge">Gorakhpur &bull; Jaunpur Sector</span>
       </div>
-
       <div class="live-sat-telemetry">
-        <!-- Live ECG Telemetry Frequency Wave -->
-        <div class="telemetry-waveform" title="Live IoT Telemetry Frequency: 48 Hz Normal">
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-        </div>
-        <span class="sat-indicator">
-          <span class="sat-spinner"></span>
-          NavIC SAT-LOCK 12/12 ACTIVE
-        </span>
-        <span style="color: var(--text-dim);">|</span>
-        <span>LIVE SYNC: <strong style="color: var(--text-main);">13:16:40 IST</strong></span>
+        <span class="live-clock-text" style="font-family:var(--font-mono); color:var(--brand-cyan); font-weight:700;">--:--:-- IST</span>
+        <span class="sat-indicator"><span class="sat-spinner"></span>NavIC 12/12 LOCKED</span>
       </div>
     </header>
 
-    <!-- Primary Brand Header -->
     <header class="main-header">
       <div class="brand-section">
         <div class="logo-badge">
-          <div class="pulse-ring-logo"></div>
-          <svg viewBox="0 0 24 24">
-            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-            <path d="M12 7v6"/>
-            <path d="M9 10h6"/>
-          </svg>
+          <svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 7v6"/><path d="M9 10h6"/></svg>
         </div>
         <div class="brand-text">
-          <h1>Seva<span class="brand-accent">Route</span> <span style="font-size: 1.15rem; font-weight: 500; color: var(--text-muted);">| सेवारूट</span></h1>
-          <div class="brand-subtitle">
-            <span>Rural Health Infrastructure & Emergency Transit Visualizer</span>
-            <span class="tier3-tag">Civil Hospitals &bull; CHCs &bull; PHCs &bull; 108 Fleet</span>
-          </div>
+          <h1>Seva<span class="brand-accent">Route</span> <span class="brand-hindi text-muted">| सेवारूट</span></h1>
+          <div class="brand-subtitle">Executive Regional Overview Dashboard</div>
         </div>
       </div>
-
-      <!-- Header Actions & District Corridor Select -->
       <div class="header-actions">
-        <!-- Sunlight Mode Toggle Button -->
-        <label for="toggle-emergency-contrast" class="contrast-toggle-label" title="Toggle High-Contrast Mode for Field Sunlight View">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          Field High-Contrast
-        </label>
-
-        <label for="modal-telemetry" class="modal-trigger-btn" title="View Full Telemetry Diagnostics">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          Telemetry Log
-        </label>
-
-        <label for="modal-dispatch" class="sos-call-btn" title="Request 108 Emergency Route Dispatch">
-          <span class="sos-icon-circle">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          </span>
-          <span>108 EMERGENCY SOS</span>
-        </label>
+        <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> English
+        </button>
+        <label for="toggle-emergency-contrast" class="contrast-toggle-label">Field Contrast</label>
+        <label for="modal-dispatch" class="sos-call-btn">108 SOS DISPATCH</label>
       </div>
     </header>
 
-    <!-- District Corridor Switcher Nav (Pure CSS Interactive Tabs) -->
-    <nav class="district-corridor-nav" aria-label="District Health Corridor Selection">
-      <div class="corridor-tabs-group">
-        <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-dim); text-transform: uppercase; margin-right: 4px;">District Sector:</span>
-        
-        <label for="corridor-all" class="corridor-tab-label">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>All UP Districts (12 Facilities)</span>
-        </label>
-
-        <label for="corridor-gkp" class="corridor-tab-label">
-          <span class="live-pulse-dot" style="background: var(--brand-cyan);"></span>
-          <span>Gorakhpur Sector (6 Facilities)</span>
-        </label>
-
-        <label for="corridor-jaunpur" class="corridor-tab-label">
-          <span class="live-pulse-dot" style="background: var(--brand-saffron);"></span>
-          <span>Jaunpur District Sector (6 Facilities)</span>
-        </label>
-      </div>
-
-      <div class="corridor-meta-info">
-        <span>Gomti River & Terai Corridors Online</span>
-        <span>&bull;</span>
-        <span style="color: var(--brand-saffron);">Jaunpur NH-31 Linked</span>
-      </div>
+    <!-- Navigation Links -->
+    <nav class="main-page-nav" aria-label="Main Page Navigation">
+      <a href="index.html" class="page-link-btn active">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Executive Overview
+      </a>
+      <a href="hospitals.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 10h6"/><path d="M12 7v6"/></svg> Hospital Grid &amp; Matrix
+      </a>
+      <a href="map.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg> Emergency GIS Map
+      </a>
+      <a href="telemetry.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Telemetry &amp; Storage
+      </a>
     </nav>
 
-    <!-- Real-time Emergency Incident Ticker -->
+    <!-- Live Alert Ticker -->
     <div class="live-alert-ticker" aria-live="polite">
       <div class="ticker-badge">
-        <span class="ticker-beacon-dot"></span>
-        LIVE EMERGENCY DISPATCH FEED
+        <span class="ticker-beacon-dot" aria-hidden="true"></span>
+        <span>LIVE ALERT</span>
       </div>
       <div class="ticker-viewport">
         <div class="ticker-track">
-          <span class="ticker-item">
-            <strong>JAUNPUR INC-9102:</strong> Head-on collision on NH-31 Shahganj-Jaunpur Road &bull; 108 ALS #21 En-route with 3 P1 Victims &bull; Destination: Pt. Deendayal Upadhyay District Hospital Jaunpur ICU-01
-          </span>
+          <span class="ticker-item"><strong>JAUNPUR O2 ALERT:</strong> Mariahu CHC O2 reserves at 8.2 hrs &bull; Resupply en-route</span>
           <span class="ticker-dot-sep">&bull;</span>
-          <span class="ticker-item">
-            <strong>JAUNPUR O2-ALERT:</strong> Mariahu CHC O2 reserves at 8.2 hrs &bull; 40-Cylinder Cryogenic Manifold Truck dispatched from Varanasi Plant (ETA: 35m)
-          </span>
-          <span class="ticker-dot-sep">&bull;</span>
-          <span class="ticker-item">
-            <strong>GKP TRAUMA INC-9042:</strong> Major Highway Trauma on NH-28 &bull; 108 Unit #14 En-route &bull; Destination: Gorakhpur Civil Hospital
-          </span>
-          <span class="ticker-dot-sep">&bull;</span>
-          <span class="ticker-item">
-            <strong>JAUNPUR MATERNAL EVAC:</strong> High-risk maternal eclampsia transfer from Baksha PHC to Jaunpur Women Civil Hospital via 108 BLS #11
-          </span>
-          <span class="ticker-dot-sep">&bull;</span>
-          <span class="ticker-item">
-            <strong>SNAKEBITE DRONE:</strong> Kusumhi Tribal PHC received 10x Polyvalent Antivenom Vials via Drone Express Corridor #03
-          </span>
+          <span class="ticker-item"><strong>HIGHWAY TRAUMA:</strong> NH-31 Shahganj &bull; 108 ALS #21 dispatched to Jaunpur Civil</span>
         </div>
       </div>
     </div>
 
-    <!-- =====================================================================
-         KPI VITALS METRIC GRID (Top Regional Telemetry)
-         ===================================================================== -->
+    <!-- Regional KPI Vitals Grid -->
     <section class="vitals-grid" aria-label="Regional Vital Indicators">
-      
-      <!-- Card 1: ICU Bed Occupancy (Critical Theme) -->
-      <div class="vital-card status-critical-theme">
+      <a href="hospitals.html" class="vital-card status-critical-theme vitals-drill-link">
         <div class="vital-header">
-          <span class="vital-title">Network ICU & Ventilators</span>
-          <span class="vital-status-pill critical">
-            <span class="live-pulse-dot critical"></span>
-            CRITICAL SURGE (92.4%)
-          </span>
+          <span class="vital-title">ICU Beds</span>
+          <span class="vital-status-pill critical"><span class="live-pulse-dot critical"></span>92.4% SURGE</span>
         </div>
-        <div class="vital-value-wrap">
-          <span class="vital-number">32</span>
-          <span class="vital-unit">/ 360 Free Beds (Gorakhpur + Jaunpur)</span>
-        </div>
-        <div class="vital-bar-track">
-          <div class="vital-bar-fill critical" style="width: 91.1%;"></div>
-        </div>
-        <div class="vital-subtext">
-          <span>Jaunpur Civil: <strong>3 Free</strong></span>
-          <span>GKP Civil: <strong>4 Free</strong></span>
-        </div>
-      </div>
+        <div class="vital-value-wrap"><span class="vital-number">32</span><span class="vital-unit">/ 360 Free Beds</span></div>
+        <div class="vital-bar-track"><div class="vital-bar-fill critical" style="width: 91.1%;"></div></div>
+        <div class="vital-subtext"><span>Jaunpur: <strong>3 Free</strong></span><span>Gorakhpur: <strong>4 Free</strong></span></div>
+      </a>
 
-      <!-- Card 2: Liquid Medical Oxygen (Warning Theme) -->
-      <div class="vital-card status-warning-theme">
+      <a href="telemetry.html" class="vital-card status-warning-theme vitals-drill-link">
         <div class="vital-header">
-          <span class="vital-title">Oxygen Reserves (LMO)</span>
-          <span class="vital-status-pill warning">
-            <span class="live-pulse-dot warning"></span>
-            12.8 HRS AVG SUPPLY
-          </span>
+          <span class="vital-title">Oxygen (LMO)</span>
+          <span class="vital-status-pill warning"><span class="live-pulse-dot warning"></span>12.8 HRS</span>
         </div>
-        <div class="vital-value-wrap">
-          <span class="vital-number">28.4</span>
-          <span class="vital-unit">kL Cryo + 820 Cylinders</span>
-        </div>
-        <div class="vital-bar-track">
-          <div class="vital-bar-fill warning" style="width: 52%;"></div>
-        </div>
-        <div class="vital-subtext">
-          <span>Jaunpur Cryo: <strong>5.2 kL</strong></span>
-          <span>Refill Trucks: <strong>3 En-Route</strong></span>
-        </div>
-      </div>
+        <div class="vital-value-wrap"><span class="vital-number">28.4</span><span class="vital-unit">kL Reserves</span></div>
+        <div class="vital-bar-track"><div class="vital-bar-fill warning" style="width: 52%;"></div></div>
+        <div class="vital-subtext"><span>Jaunpur: <strong>5.2 kL</strong></span><span>Trucks: <strong>3 En-Route</strong></span></div>
+      </a>
 
-      <!-- Card 3: Active Duty Emergency Doctors (Stable Theme) -->
-      <div class="vital-card status-stable-theme">
+      <a href="hospitals.html" class="vital-card status-stable-theme vitals-drill-link">
         <div class="vital-header">
-          <span class="vital-title">Trauma Doctors & Surgeons</span>
-          <span class="vital-status-pill stable">
-            <span class="live-pulse-dot stable"></span>
-            74 ACTIVE ROSTER
-          </span>
+          <span class="vital-title">Specialists</span>
+          <span class="vital-status-pill stable"><span class="live-pulse-dot stable"></span>74 ACTIVE</span>
         </div>
-        <div class="vital-value-wrap">
-          <span class="vital-number">74</span>
-          <span class="vital-unit">On Floor across 12 Facilities</span>
-        </div>
-        <div class="vital-bar-track">
-          <div class="vital-bar-fill stable" style="width: 88%;"></div>
-        </div>
-        <div class="vital-subtext">
-          <span>Surgeons: <strong>16 Active</strong></span>
-          <span>Anesthetists: <strong>12 Active</strong></span>
-        </div>
-      </div>
+        <div class="vital-value-wrap"><span class="vital-number">74</span><span class="vital-unit">On Duty Roster</span></div>
+        <div class="vital-bar-track"><div class="vital-bar-fill stable" style="width: 88%;"></div></div>
+        <div class="vital-subtext"><span>Surgeons: <strong>16</strong></span><span>Anesthetists: <strong>12</strong></span></div>
+      </a>
 
-      <!-- Card 4: 108 Emergency Rural Fleet (Cyan Telemetry Theme) -->
-      <div class="vital-card status-cyan-theme">
+      <a href="map.html" class="vital-card status-cyan-theme vitals-drill-link">
         <div class="vital-header">
-          <span class="vital-title">108 Fleet & Rural Transit</span>
-          <span class="vital-status-pill info">
-            <span class="live-pulse-dot stable"></span>
-            46/52 ACTIVE
-          </span>
+          <span class="vital-title">108 Fleet</span>
+          <span class="vital-status-pill info"><span class="live-pulse-dot stable"></span>46/52 ACTIVE</span>
         </div>
-        <div class="vital-value-wrap">
-          <span class="vital-number">13.5</span>
-          <span class="vital-unit">min Avg Village ETA</span>
-        </div>
-        <div class="vital-bar-track">
-          <div class="vital-bar-fill cyan" style="width: 85%;"></div>
-        </div>
-        <div class="vital-subtext">
-          <span>Jaunpur Fleet: <strong>22 Active</strong></span>
-          <span>Gorakhpur Fleet: <strong>24 Active</strong></span>
-        </div>
-      </div>
-
+        <div class="vital-value-wrap"><span class="vital-number">13.5</span><span class="vital-unit">min Avg ETA</span></div>
+        <div class="vital-bar-track"><div class="vital-bar-fill cyan" style="width: 85%;"></div></div>
+        <div class="vital-subtext"><span>Jaunpur: <strong>22 Active</strong></span><span>Gorakhpur: <strong>24 Active</strong></span></div>
+      </a>
     </section>
 
-    <!-- =====================================================================
-         DASHBOARD MAIN GRID (Left Hospital Matrix & Right Route Map)
-         ===================================================================== -->
-    <main class="dashboard-main-grid">
-
-      <!-- LEFT COLUMN: Hospital Availability & Resource Matrix -->
-      <section class="section-panel" aria-label="Hospital Infrastructure Matrix">
-        
-        <!-- Filter Radio Inputs (Pure CSS Health Status Filtering) -->
-        <input type="radio" name="health-status-filter" id="filter-all" class="filter-radio" checked>
-        <input type="radio" name="health-status-filter" id="filter-critical" class="filter-radio">
-        <input type="radio" name="health-status-filter" id="filter-warning" class="filter-radio">
-        <input type="radio" name="health-status-filter" id="filter-stable" class="filter-radio">
-
-        <!-- Section Header with Interactive CSS Filter Tabs -->
-        <div class="section-header-bar">
-          <div class="section-title-wrap">
-            <div class="section-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><path d="M10 9h4"/><path d="M12 7v4"/></svg>
-            </div>
-            <h2 class="section-title">Hospitals & Health Centers</h2>
-            <span class="section-counter">12 Monitored Facilities</span>
-          </div>
-
-          <!-- Pure CSS Health Status Filter Buttons -->
-          <div class="filter-controls" role="tablist">
-            <label for="filter-all" class="filter-btn" role="tab" tabindex="0">
-              <span>All Statuses</span>
-            </label>
-            <label for="filter-critical" class="filter-btn" role="tab" tabindex="0">
-              <span class="live-pulse-dot critical"></span>
-              <span>Critical Alerts</span>
-              <span style="opacity: 0.6;">(4)</span>
-            </label>
-            <label for="filter-warning" class="filter-btn" role="tab" tabindex="0">
-              <span class="live-pulse-dot warning"></span>
-              <span>Caution / Low O2</span>
-              <span style="opacity: 0.6;">(4)</span>
-            </label>
-            <label for="filter-stable" class="filter-btn" role="tab" tabindex="0">
-              <span class="live-pulse-dot stable"></span>
-              <span>Ready / Available</span>
-              <span style="opacity: 0.6;">(4)</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Hospital Cards List Container -->
-        <div class="hospitals-matrix-list">
-
-          <!-- ==============================================================
-               JAUNPUR HOSPITAL 1: Pt. Deendayal Upadhyay District Hospital (Jaunpur Civil) [CRITICAL]
-               ============================================================== -->
-          <article class="hospital-card card-status-critical district-jaunpur" id="hospital-jaunpur-civil">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill jaunpur">Jaunpur District</span>
-                  <span class="h-type-badge dch">Apex District Civil Hospital</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 6 min (NH-31 City Bypass)
-                  </span>
-                </div>
-                <h3 class="h-name">Pt. Deendayal Upadhyay District Hospital (Jaunpur Civil)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Line Bazar, Jaunpur &bull; Pin: 222002 &bull; 250-Bed Apex Trauma Hub
-                </div>
-              </div>
-
-              <div class="h-status-badge critical">
-                <span class="live-pulse-dot critical"></span>
-                CRITICAL SURGE (94% FULL)
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>ICU Beds Free</span>
-                  <span style="color: var(--status-critical);">3 Free / 48</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">3</span>
-                  <span class="h-metric-total">/ 48 (94% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 93.75%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Oxygen Reserves</span>
-                  <span style="color: var(--status-critical);">5.1 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">2.2</span>
-                  <span class="h-metric-total">kL Cryo (22%)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 22%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Duty Surgeons</span>
-                  <span style="color: var(--status-stable);">5 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">5</span>
-                  <span class="h-metric-total">Specialists on Floor</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 85%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Blood Bank (O-)</span>
-                  <span style="color: var(--status-critical);">2 Units Low</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">2</span>
-                  <span class="h-metric-total">Units (Crit Reserve)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 20%;"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Doctor Duty Roster Badges -->
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Akhilesh Upadhyay (Chief Trauma Surgeon - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. R. K. Srivastava (Critical Care Anesthetist - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Meenakshi Singh (Neuro-trauma MD - ON DUTY)</span>
-              <span class="doc-tag offline-doc">&bull; Dr. S. P. Yadav (Orthopedic Surgeon - ON CALL)</span>
-            </div>
-
-            <!-- Card Infrastructure & Transit Footer -->
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable" title="Dedicated 33kV Feeder + 500kVA DG Backup">
-                  ⚡ Power: Direct Grid + 500kVA DG (100%)
-                </span>
-                <span class="infra-badge alert" title="Heavy emergency traffic from Shahi Bridge corridor">
-                  🚦 Shahi Bridge Transit: Heavy Inflow &bull; Green Corridor Active
-                </span>
-                <span class="infra-badge passable" title="NH-31 Varanasi-Lucknow Four Lane Access Open">
-                  🛣️ NH-31 Four-Lane: Open & Clear
-                </span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm divert-btn">
-                  <span>⚠️ Reroute to Shahganj SDH</span>
-                </label>
-                <label for="modal-dispatch" class="action-btn-sm saffron-btn">
-                  <span>Jaunpur Bed Lock</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               JAUNPUR HOSPITAL 2: Sub-District Hospital Shahganj (Jaunpur) [STABLE]
-               ============================================================== -->
-          <article class="hospital-card card-status-stable district-jaunpur" id="hospital-jaunpur-shahganj">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill jaunpur">Jaunpur District</span>
-                  <span class="h-type-badge sdh">Sub-District Hospital (SDH)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 19 min (Shahganj-Jaunpur Highway)
-                  </span>
-                </div>
-                <h3 class="h-name">Sub-District Hospital (Shahganj Division, Jaunpur)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Shahganj Tehsil, North Jaunpur &bull; Pin: 223101 &bull; 100-Bed Facility
-                </div>
-              </div>
-
-              <div class="h-status-badge stable">
-                <span class="live-pulse-dot stable"></span>
-                STABLE CAPACITY & READY
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>ICU Beds Free</span>
-                  <span style="color: var(--status-stable);">14 Free / 28</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">14</span>
-                  <span class="h-metric-total">/ 28 (50% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 50%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Oxygen Reserves</span>
-                  <span style="color: var(--status-stable);">40.0 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">4.8</span>
-                  <span class="h-metric-total">kL Cryo (88%)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 88%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Duty Doctors</span>
-                  <span style="color: var(--status-stable);">5 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">2+3</span>
-                  <span class="h-metric-total">Surgeons + GDMOs</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 85%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Blood Bank (O-)</span>
-                  <span style="color: var(--status-stable);">9 Units Safe</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">9</span>
-                  <span class="h-metric-total">Units (Optimum)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 90%;"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Doctor Duty Roster Badges -->
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Alok Rai (General Surgeon - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Pooja Maurya (Pediatric Specialist - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. S. K. Tiwari (Emergency Anesthetist - ON DUTY)</span>
-            </div>
-
-            <!-- Card Infrastructure & Transit Footer -->
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable" title="Solar power array with 100% battery reserve">
-                  ☀️ Solar Hybrid (100% Fully Charged)
-                </span>
-                <span class="infra-badge passable" title="Shahganj Sugar Mill corridor clear">
-                  🛣️ Shahganj Link Corridor: Clear & Passable
-                </span>
-                <span class="infra-badge passable" title="Tele-ICU link with BHU Varanasi active">
-                  📡 Tele-ICU BHU Varanasi Link: 100 Mbps Locked
-                </span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn">
-                  <span>🚑 Route 108 Priority Dispatch</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               JAUNPUR HOSPITAL 3: Community Health Center (Mariahu CHC) [WARNING]
-               ============================================================== -->
-          <article class="hospital-card card-status-warning district-jaunpur" id="hospital-jaunpur-mariahu">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill jaunpur">Jaunpur District</span>
-                  <span class="h-type-badge chc">Community Health Center (FRU)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 24 min (South Jaunpur Link)
-                  </span>
-                </div>
-                <h3 class="h-name">Community Health Center (Mariahu CHC - FRU)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Mariahu Tehsil, South Jaunpur &bull; Pin: 222161 &bull; 30-Bed First Referral Unit
-                </div>
-              </div>
-
-              <div class="h-status-badge warning">
-                <span class="live-pulse-dot warning"></span>
-                WARNING: O2 LOW (8.2 HRS)
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Maternal / ICU</span>
-                  <span style="color: var(--status-warning);">3 Free / 16</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-warning);">3</span>
-                  <span class="h-metric-total">/ 16 (81% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill warning" style="width: 81.25%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>O2 Manifold</span>
-                  <span style="color: var(--status-warning);">8.2 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-warning);">24</span>
-                  <span class="h-metric-total">D-Cylinders Active</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill warning" style="width: 28%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Duty Doctors</span>
-                  <span style="color: var(--status-warning);">2 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">1+1</span>
-                  <span class="h-metric-total">Emergency MO + Gynae</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill warning" style="width: 50%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Blood Bank (O-)</span>
-                  <span style="color: var(--status-critical);">1 Unit Low</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">1</span>
-                  <span class="h-metric-total">Unit (Need Refill)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 12%;"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Doctor Duty Roster Badges -->
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. R. B. Patel (Emergency Medical Officer - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Vandana Dubey (Obstetrician & Gynae - ON DUTY)</span>
-            </div>
-
-            <!-- Card Infrastructure & Transit Footer -->
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge caution" title="Mariahu railway level crossing gate closure causes 6-10 min delay">
-                  ⚠️ Mariahu Railway Crossing: Intermittent Gates &bull; Divert via Flyover
-                </span>
-                <span class="infra-badge passable" title="Diesel Generator Fuel at 72% capacity">
-                  ⛽ Genset Backup: 20 hrs fuel remaining
-                </span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn">
-                  <span>🚚 Expedite Oxygen Tanker</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               JAUNPUR HOSPITAL 4: Machhlishahr Sub-Divisional Hospital (Jaunpur) [STABLE]
-               ============================================================== -->
-          <article class="hospital-card card-status-stable district-jaunpur" id="hospital-jaunpur-machhlishahr">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill jaunpur">Jaunpur District</span>
-                  <span class="h-type-badge sdh">Sub-Divisional Hospital</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 26 min (NH-31 West Sector)
-                  </span>
-                </div>
-                <h3 class="h-name">Machhlishahr Sub-Divisional Hospital (Jaunpur)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Machhlishahr Tehsil &bull; Pin: 222143 &bull; 60-Bed Rural Triage Center
-                </div>
-              </div>
-
-              <div class="h-status-badge stable">
-                <span class="live-pulse-dot stable"></span>
-                STABLE CAPACITY
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Emergency Beds</span>
-                  <span style="color: var(--status-stable);">11 Free / 20</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">11</span>
-                  <span class="h-metric-total">/ 20 (45% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 45%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Oxygen Reserves</span>
-                  <span style="color: var(--status-stable);">34.0 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">3.6</span>
-                  <span class="h-metric-total">kL Cryo (80%)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 80%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Duty Doctors</span>
-                  <span style="color: var(--status-stable);">4 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">4</span>
-                  <span class="h-metric-total">Medical Officers</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 80%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Blood Bank (O-)</span>
-                  <span style="color: var(--status-stable);">5 Units Safe</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">5</span>
-                  <span class="h-metric-total">Units Available</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 60%;"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Doctor Duty Roster Badges -->
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Vinay Kumar (Emergency Surgeon - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. R. C. Gupta (General Physician - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Neelam Yadav (Anesthesia - ON DUTY)</span>
-            </div>
-
-            <!-- Card Infrastructure & Transit Footer -->
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable" title="Four-lane highway bypass active">
-                  🛣️ NH-31 Bypass: Clear all-weather access
-                </span>
-                <span class="infra-badge passable" title="Dedicated sub-station power feed">
-                  ⚡ Power: Direct Grid Feeder
-                </span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn">
-                  <span>🚑 Accept Patient Transfers</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               JAUNPUR HOSPITAL 5: Gram Health & Wellness PHC (Baksha / Gomti Basin) [CRITICAL]
-               ============================================================== -->
-          <article class="hospital-card card-status-critical district-jaunpur" id="hospital-jaunpur-baksha">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill jaunpur">Jaunpur District</span>
-                  <span class="h-type-badge phc">Primary Health Center 24x7</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 31 min (Gomti Riverbank Rural Track)
-                  </span>
-                </div>
-                <h3 class="h-name">Gram Health & Wellness Center (Baksha PHC, Gomti Basin)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Baksha Block, Rural Jaunpur &bull; Pin: 222109 &bull; 8-Bed Tele-Clinic
-                </div>
-              </div>
-
-              <div class="h-status-badge critical">
-                <span class="live-pulse-dot critical"></span>
-                CRITICAL: ANTIVENOM LOW & CAUSEWAY FLOODED
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Observation Beds</span>
-                  <span style="color: var(--status-critical);">1 Free / 8</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">1</span>
-                  <span class="h-metric-total">/ 8 (87% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 87.5%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>O2 Cylinders</span>
-                  <span style="color: var(--status-critical);">4.8 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">3</span>
-                  <span class="h-metric-total">B-Type Cylinders</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 20%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Medical Staff</span>
-                  <span style="color: var(--status-stable);">3 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">1+2</span>
-                  <span class="h-metric-total">MO + CHOs Active</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 75%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Snake Antivenom</span>
-                  <span style="color: var(--status-critical);">1 Vial Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">1</span>
-                  <span class="h-metric-total">Vial (Urgent Restock)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 10%;"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Doctor Duty Roster Badges -->
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Prashant Mishra (Medical Officer In-charge - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Staff Nurse Sunita Bind (Midwifery Certified - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Manoj Yadav (Tele-Medicine Coordinator - ON DUTY)</span>
-            </div>
-
-            <!-- Card Infrastructure & Transit Footer -->
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge alert" title="Gomti tributary overflowed onto village link causeway">
-                  🌊 Gomti Causeway Waterlogged 0.4m &bull; 4x4 Heavy Ambulance Needed
-                </span>
-                <span class="infra-badge caution" title="Running on Solar Inverter backup with 5.5 hrs reserve">
-                  🔋 Power: Battery Inverter (5.5 Hrs Reserve)
-                </span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn" style="background: rgba(239, 68, 68, 0.2); border-color: var(--status-critical); color: #fca5a5;">
-                  <span>🛸 Launch Drone Antivenom Air-Drop</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               JAUNPUR HOSPITAL 6: Community Health Center (Kerakat CHC) [WARNING]
-               ============================================================== -->
-          <article class="hospital-card card-status-warning district-jaunpur" id="hospital-jaunpur-kerakat">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill jaunpur">Jaunpur District</span>
-                  <span class="h-type-badge chc">Community Health Center (CHC)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 21 min (East Gomti Sector)
-                  </span>
-                </div>
-                <h3 class="h-name">Community Health Center (Kerakat CHC, Jaunpur)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Kerakat Tehsil, East Jaunpur &bull; Pin: 222142 &bull; 30-Bed First Referral Center
-                </div>
-              </div>
-
-              <div class="h-status-badge warning">
-                <span class="live-pulse-dot warning"></span>
-                WARNING: SURGE IN PEDIA CASES
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Pediatric / ICU</span>
-                  <span style="color: var(--status-warning);">4 Free / 16</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-warning);">4</span>
-                  <span class="h-metric-total">/ 16 (75% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill warning" style="width: 75%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Oxygen Storage</span>
-                  <span style="color: var(--status-stable);">18.0 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-stable);">32</span>
-                  <span class="h-metric-total">D-Cylinders Active</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 60%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Duty Doctors</span>
-                  <span style="color: var(--status-stable);">3 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">3</span>
-                  <span class="h-metric-total">Pediatrician + MOs</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 75%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Blood Bank (O-)</span>
-                  <span style="color: var(--status-warning);">2 Units Low</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-warning);">2</span>
-                  <span class="h-metric-total">Units (Reserve Alert)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill warning" style="width: 25%;"></div>
-                </div>
-              </div>
-
-            </div>
-
-            <!-- Doctor Duty Roster Badges -->
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Sanjay Jaiswal (Pediatric Specialist - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. N. K. Sharma (Emergency MO - ON DUTY)</span>
-            </div>
-
-            <!-- Card Infrastructure & Transit Footer -->
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable" title="Kerakat-Jaunpur state highway clear">
-                  🛣️ Kerakat State Highway: Clear & Passable
-                </span>
-                <span class="infra-badge passable" title="Dual grid substation operational">
-                  ⚡ Power: Direct Grid Feeder + Backup Gen
-                </span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn">
-                  <span>🚑 Route Neonatal Dispatch</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               GORAKHPUR HOSPITAL 1: District Civil Hospital (Gorakhpur Central) [CRITICAL]
-               ============================================================== -->
-          <article class="hospital-card card-status-critical district-gkp" id="hospital-dch-central">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill gkp">Gorakhpur District</span>
-                  <span class="h-type-badge dch">District Civil Hospital (Apex)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 8 min (NH-28 Corridor)
-                  </span>
-                </div>
-                <h3 class="h-name">District Civil Hospital (Gorakhpur Central)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Civil Lines, Gorakhpur &bull; Pin: 273001 &bull; Tier-1 Apex Trauma
-                </div>
-              </div>
-
-              <div class="h-status-badge critical">
-                <span class="live-pulse-dot critical"></span>
-                CRITICAL SURGE (94% FULL)
-              </div>
-            </div>
-
-            <!-- Resource Indicators Row -->
-            <div class="h-metrics-row">
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>ICU Beds Free</span>
-                  <span style="color: var(--status-critical);">4 Free / 64</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">4</span>
-                  <span class="h-metric-total">/ 64 (94% Full)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 93.75%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Oxygen Reserves</span>
-                  <span style="color: var(--status-critical);">4.2 Hrs Left</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">1.8</span>
-                  <span class="h-metric-total">kL Cryo (18%)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 18%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Duty Surgeons</span>
-                  <span style="color: var(--status-stable);">4 Active</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--text-pure);">4</span>
-                  <span class="h-metric-total">Surgeons on Floor</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill stable" style="width: 80%;"></div>
-                </div>
-              </div>
-
-              <div class="h-metric-block">
-                <div class="h-metric-label">
-                  <span>Blood Bank (O-)</span>
-                  <span style="color: var(--status-critical);">1 Unit Low</span>
-                </div>
-                <div class="h-metric-value-wrap">
-                  <span class="h-metric-val" style="color: var(--status-critical);">1</span>
-                  <span class="h-metric-total">Units (Crit Reserve)</span>
-                </div>
-                <div class="mini-bar-track">
-                  <div class="mini-bar-fill critical" style="width: 15%;"></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. R. Verma (Chief Trauma Surgeon - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. S. Tripathi (Cardio Anesthetist - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. N. Gupta (Neuro-trauma - ON DUTY)</span>
-            </div>
-
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable">⚡ Power: Dual Grid + 750kVA DG (100%)</span>
-                <span class="infra-badge alert">🚦 Gate Transit: 5 Ambulances Queued</span>
-                <span class="infra-badge passable">🛣️ NH-28 Bypass: Green Corridor OPEN</span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm divert-btn"><span>⚠️ Reroute to SDH Bansgaon</span></label>
-                <label for="modal-dispatch" class="action-btn-sm route-btn"><span>Bed Lock</span></label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               GORAKHPUR HOSPITAL 2: Sub-District Civil Hospital (Bansgaon) [STABLE]
-               ============================================================== -->
-          <article class="hospital-card card-status-stable district-gkp" id="hospital-sdh-bansgaon">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill gkp">Gorakhpur District</span>
-                  <span class="h-type-badge sdh">Sub-District Hospital (SDH)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 22 min (SH-10 South Route)
-                  </span>
-                </div>
-                <h3 class="h-name">Sub-District Civil Hospital (Bansgaon Division)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Bansgaon Tehsil, Rural Gorakhpur &bull; 100-Bed Facility
-                </div>
-              </div>
-
-              <div class="h-status-badge stable">
-                <span class="live-pulse-dot stable"></span>
-                STABLE CAPACITY & READY
-              </div>
-            </div>
-
-            <div class="h-metrics-row">
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>ICU Beds Free</span><span style="color: var(--status-stable);">18 Free / 32</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">18</span><span class="h-metric-total">/ 32 (43% Full)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 43.75%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Oxygen Reserves</span><span style="color: var(--status-stable);">38.5 Hrs Left</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">4.5</span><span class="h-metric-total">kL Cryo (85%)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 85%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Duty Doctors</span><span style="color: var(--status-stable);">6 Active</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--text-pure);">2+4</span><span class="h-metric-total">Surgeon + GDMOs</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 90%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Blood Bank (O-)</span><span style="color: var(--status-stable);">8 Units Safe</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">8</span><span class="h-metric-total">Units (Optimum)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 80%;"></div></div>
-              </div>
-            </div>
-
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. P. Mishra (General Surgeon - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Ananya Sen (Pediatrician - ON DUTY)</span>
-            </div>
-
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable">☀️ Solar Hybrid Grid (100% Fully Charged)</span>
-                <span class="infra-badge passable">🛣️ SH-10 South Access: Passable</span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn"><span>🚑 Route 108 Priority Dispatch</span></label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               GORAKHPUR HOSPITAL 3: Community Health Center (Sahjanwa CHC) [WARNING]
-               ============================================================== -->
-          <article class="hospital-card card-status-warning district-gkp" id="hospital-chc-sahjanwa">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill gkp">Gorakhpur District</span>
-                  <span class="h-type-badge chc">Community Health Center (CHC)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 17 min (West Industrial Link)
-                  </span>
-                </div>
-                <h3 class="h-name">Community Health Center (Sahjanwa CHC)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Sahjanwa Industrial Belt &bull; 30-Bed First Referral Unit (FRU)
-                </div>
-              </div>
-
-              <div class="h-status-badge warning">
-                <span class="live-pulse-dot warning"></span>
-                WARNING: OXYGEN LOW (9.8 HRS)
-              </div>
-            </div>
-
-            <div class="h-metrics-row">
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Emergency Beds</span><span style="color: var(--status-warning);">4 Free / 16</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-warning);">4</span><span class="h-metric-total">/ 16 (75% Full)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill warning" style="width: 75%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Oxygen Manifold</span><span style="color: var(--status-warning);">9.8 Hrs Left</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-warning);">28</span><span class="h-metric-total">D-Cylinders</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill warning" style="width: 32%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Duty Doctors</span><span style="color: var(--status-warning);">2 Active</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--text-pure);">1+1</span><span class="h-metric-total">Trauma MD + Gynae</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill warning" style="width: 50%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Blood Bank (O-)</span><span style="color: var(--status-critical);">0 Units (DEPLETED)</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-critical);">0</span><span class="h-metric-total">Units (Crossmatch Req)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill critical" style="width: 0%;"></div></div>
-              </div>
-            </div>
-
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. D. K. Chaurasia (Trauma MO - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Sunita Roy (Obstetrician - ON DUTY)</span>
-            </div>
-
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge caution">⚠️ PWD Access Road: Single-Lane Construction</span>
-                <span class="infra-badge passable">⛽ Genset Backup: 18 hrs remaining</span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn"><span>🚚 Expedite O2 Tanker</span></label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               GORAKHPUR HOSPITAL 4: Tribal PHC (Kusumhi Gram PHC) [CRITICAL]
-               ============================================================== -->
-          <article class="hospital-card card-status-critical district-gkp" id="hospital-phc-kusumhi">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill gkp">Gorakhpur District</span>
-                  <span class="h-type-badge phc">Primary Health Center (PHC 24x7)</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 34 min (Forest Unpaved Track)
-                  </span>
-                </div>
-                <h3 class="h-name">Tribal Health & Wellness Center (Kusumhi Gram PHC)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Kusumhi Forest Tribal Belt &bull; 8-Bed Remote Tele-Medicine Hub
-                </div>
-              </div>
-
-              <div class="h-status-badge critical">
-                <span class="live-pulse-dot critical"></span>
-                CRITICAL: ANTIVENOM & POWER LOW
-              </div>
-            </div>
-
-            <div class="h-metrics-row">
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Observation Beds</span><span style="color: var(--status-critical);">1 Free / 8</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-critical);">1</span><span class="h-metric-total">/ 8 (87% Full)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill critical" style="width: 87.5%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>O2 Cylinders</span><span style="color: var(--status-critical);">5.5 Hrs Left</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-critical);">4</span><span class="h-metric-total">B-Type Cylinders</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill critical" style="width: 22%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Medical Staff</span><span style="color: var(--status-stable);">3 Active</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--text-pure);">1+2</span><span class="h-metric-total">MO + CHOs</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 75%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Snake Antivenom</span><span style="color: var(--status-critical);">2 Vials Left</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-critical);">2</span><span class="h-metric-total">Vials (Restock Req)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill critical" style="width: 12%;"></div></div>
-              </div>
-            </div>
-
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Arvind Paswan (MO In-charge - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Sister Meena (Staff Nurse - ON DUTY)</span>
-            </div>
-
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge alert">🌧️ Road Status: Unpaved Slush &bull; 4x4 Required</span>
-                <span class="infra-badge caution">🔋 Power: Battery Inverter (4.2 Hrs Reserve)</span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn" style="background: rgba(239, 68, 68, 0.2); border-color: var(--status-critical); color: #fca5a5;">
-                  <span>🛸 Drone Antivenom Air-Drop</span>
-                </label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               GORAKHPUR HOSPITAL 5: Taluka Civil Hospital (Pipraich) [STABLE]
-               ============================================================== -->
-          <article class="hospital-card card-status-stable district-gkp" id="hospital-sdh-pipraich">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill gkp">Gorakhpur District</span>
-                  <span class="h-type-badge sdh">Taluka Sub-District Hospital</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 28 min (East Sugarcane Highway)
-                  </span>
-                </div>
-                <h3 class="h-name">Taluka Civil Hospital (Pipraich Sub-Center)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Pipraich Town &bull; 50-Bed Emergency Center
-                </div>
-              </div>
-
-              <div class="h-status-badge stable">
-                <span class="live-pulse-dot stable"></span>
-                STABLE CAPACITY
-              </div>
-            </div>
-
-            <div class="h-metrics-row">
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>ICU Beds Free</span><span style="color: var(--status-stable);">12 Free / 20</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">12</span><span class="h-metric-total">/ 20 (40% Full)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 40%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Oxygen Reserves</span><span style="color: var(--status-stable);">42.0 Hrs Left</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">6.0</span><span class="h-metric-total">kL Cryo (92%)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 92%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Duty Doctors</span><span style="color: var(--status-stable);">4 Active</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--text-pure);">4</span><span class="h-metric-total">Specialists</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 85%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Blood Bank (O-)</span><span style="color: var(--status-stable);">6 Units Safe</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">6</span><span class="h-metric-total">Units Safe</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 60%;"></div></div>
-              </div>
-            </div>
-
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. H. S. Rawat (Orthopedic Surgeon - ON DUTY)</span>
-              <span class="doc-tag active-doc">&bull; Dr. Kavita Singh (Anesthesia - ON DUTY)</span>
-            </div>
-
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge passable">🛣️ SH-82 Four-lane: Clear</span>
-                <span class="infra-badge passable">⚡ Power: 100% Dedicated Feeder</span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn"><span>🚑 Accept Transfers</span></label>
-              </div>
-            </div>
-
-          </article>
-
-
-          <!-- ==============================================================
-               GORAKHPUR HOSPITAL 6: Mobile Field Container #04 [WARNING]
-               ============================================================== -->
-          <article class="hospital-card card-status-warning district-gkp" id="hospital-mobile-04">
-            
-            <div class="h-card-top">
-              <div class="h-identity">
-                <div class="h-tier-tags">
-                  <span class="h-district-pill gkp">Gorakhpur District</span>
-                  <span class="h-type-badge chc">Rapid Tele-ICU Container</span>
-                  <span class="h-eta-tag">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    ETA 12 min (Rapti Riverbank)
-                  </span>
-                </div>
-                <h3 class="h-name">Mobile Emergency Container Unit #04 (Riverine Belt)</h3>
-                <div class="h-location">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Rapti River Basin Flood Sector &bull; Sat-Linked 6-Bed Container
-                </div>
-              </div>
-
-              <div class="h-status-badge warning">
-                <span class="live-pulse-dot warning"></span>
-                TRANSIT CAUTION: WATERLOGGING
-              </div>
-            </div>
-
-            <div class="h-metrics-row">
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Stabilization Beds</span><span style="color: var(--status-warning);">3 Free / 6</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-warning);">3</span><span class="h-metric-total">/ 6 (50% Full)</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill warning" style="width: 50%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>PSA O2 Generator</span><span style="color: var(--status-stable);">16.0 Hrs Cont.</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">96%</span><span class="h-metric-total">PSA Purity</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 96%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Paramedic Team</span><span style="color: var(--status-stable);">4 Active</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--text-pure);">2+2</span><span class="h-metric-total">Paramedics + MO</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 80%;"></div></div>
-              </div>
-              <div class="h-metric-block">
-                <div class="h-metric-label"><span>Cold Storage Vax</span><span style="color: var(--status-stable);">Safe (3.4°C)</span></div>
-                <div class="h-metric-value-wrap"><span class="h-metric-val" style="color: var(--status-stable);">100%</span><span class="h-metric-total">Cold Maintained</span></div>
-                <div class="mini-bar-track"><div class="mini-bar-fill stable" style="width: 100%;"></div></div>
-              </div>
-            </div>
-
-            <div class="doctors-roster-tags">
-              <span class="doc-tag active-doc">&bull; Dr. Manish Jha (Tele-Emergency Physician - ACTIVE)</span>
-              <span class="doc-tag active-doc">&bull; Paramedic Lead S. Shinde (ALS Certified)</span>
-            </div>
-
-            <div class="h-infra-footer">
-              <div class="infra-badges">
-                <span class="infra-badge caution">🌊 Rapti Causeway Submerged &bull; Detour via Bund Road</span>
-                <span class="infra-badge passable">🛰️ ISRO Tele-Medicine Dish: 98%</span>
-              </div>
-              <div class="card-actions-group">
-                <label for="modal-dispatch" class="action-btn-sm route-btn"><span>📡 Tele-Triage Connect</span></label>
-              </div>
-            </div>
-
-          </article>
-
-        </div>
-      </section>
-
-
-      <!-- RIGHT COLUMN: Rural GIS Transit Map & Live Incident Triage Stream -->
-      <aside class="right-sidebar-stack" aria-label="Emergency Transit Routing & Feeds">
-        
-        <!-- 1. Real-time GIS Vector Transit Map (Pure CSS/SVG Visualizer for UP East: Gorakhpur & Jaunpur) -->
-        <div class="map-visualizer-card">
-          <div class="section-title-wrap">
-            <div class="section-icon" style="color: var(--brand-saffron);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
-            </div>
-            <div>
-              <h3 class="section-title" style="font-size: 1.05rem;">UP East Emergency Transit Map</h3>
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">Gorakhpur & Jaunpur Gomti River Grid</span>
-            </div>
-          </div>
-
-          <!-- Stylized Tactical Map Viewport -->
-          <div class="map-viewport">
-            <div class="map-grid-mesh"></div>
-            
-            <!-- Rotating Radar Sweep -->
-            <div class="radar-sweep-container"></div>
-
-            <!-- SVG Vector Routes & Nodes -->
-            <svg class="map-svg-routes" viewBox="0 0 420 320">
-              <defs>
-                <filter id="glow-red" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-                <filter id="glow-green" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-                <filter id="glow-amber" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-                <filter id="glow-saffron" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-
-              <!-- Gomti River Curved Blue Ribbon (Jaunpur Corridor) -->
-              <path d="M10 260 C80 230, 140 280, 220 250 C300 220, 360 270, 420 240" fill="none" stroke="rgba(6, 182, 212, 0.25)" stroke-width="6" stroke-linecap="round"/>
-              <text x="360" y="235" font-size="7" fill="rgba(6, 182, 212, 0.6)" font-family="monospace">GOMTI RIVER</text>
-
-              <!-- ==============================================================
-                   LAYER 1: JAUNPUR DISTRICT ROUTE CORRIDORS
-                   ============================================================== -->
-              <g class="jaunpur-route-layer">
-                <!-- Route J1: Shahganj SDH (Green) -> Jaunpur Civil Hospital (NH-31) -->
-                <path class="route-corridor green-corridor" d="M110 180 Q160 210 210 230" fill="none" stroke-width="3" filter="url(#glow-green)"/>
-
-                <!-- Route J2: Mariahu CHC (Amber) -> Jaunpur Civil Hospital -->
-                <path class="route-corridor caution-corridor" d="M290 280 Q250 250 210 230" fill="none" stroke-width="2.5" filter="url(#glow-amber)"/>
-
-                <!-- Route J3: Baksha PHC (Red) -> Jaunpur Civil Hospital -->
-                <path class="route-corridor critical-corridor" d="M90 270 Q150 250 210 230" fill="none" stroke-width="3" filter="url(#glow-red)"/>
-
-                <!-- Route J4: Machhlishahr SDH -> Mariahu -->
-                <path class="route-corridor saffron-corridor" d="M30 220 Q70 250 110 180" fill="none" stroke-width="2" stroke-dasharray="4 4"/>
-
-                <!-- Route J5: Kerakat CHC -> Jaunpur Civil -->
-                <path class="route-corridor green-corridor" d="M330 210 Q270 220 210 230" fill="none" stroke-width="2.5" filter="url(#glow-green)"/>
-
-                <!-- JAUNPUR NODE 1: Pt. Deendayal Upadhyay Jaunpur Civil Hospital (Apex Red) -->
-                <g class="map-node-pin" transform="translate(210, 230)">
-                  <circle r="18" fill="rgba(239, 68, 68, 0.25)" stroke="#ef4444" stroke-width="1.5">
-                    <animate attributeName="r" values="14;22;14" dur="2s" repeatCount="indefinite"/>
-                    <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
-                  </circle>
-                  <circle r="9" fill="#ef4444"/>
-                  <text x="0" y="4" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">JNP</text>
-                  <text x="0" y="-14" font-size="9" font-weight="700" fill="#f87171" text-anchor="middle" font-family="'Outfit', sans-serif">JAUNPUR CIVIL (94%)</text>
-                </g>
-
-                <!-- JAUNPUR NODE 2: Shahganj SDH (Green) -->
-                <g class="map-node-pin" transform="translate(110, 180)">
-                  <circle r="12" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5"/>
-                  <circle r="6" fill="#10b981"/>
-                  <text x="0" y="3" font-size="6" font-weight="800" fill="#fff" text-anchor="middle">SHG</text>
-                  <text x="0" y="-9" font-size="7" font-weight="600" fill="#6ee7b7" text-anchor="middle">Shahganj (14 Free)</text>
-                </g>
-
-                <!-- JAUNPUR NODE 3: Mariahu CHC (Amber) -->
-                <g class="map-node-pin" transform="translate(290, 280)">
-                  <circle r="11" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b" stroke-width="1.5"/>
-                  <circle r="5" fill="#f59e0b"/>
-                  <text x="0" y="14" font-size="7" font-weight="600" fill="#fde68a" text-anchor="middle">Mariahu (Low O2)</text>
-                </g>
-
-                <!-- JAUNPUR NODE 4: Baksha PHC (Red) -->
-                <g class="map-node-pin" transform="translate(90, 270)">
-                  <circle r="11" fill="rgba(239, 68, 68, 0.25)" stroke="#ef4444" stroke-width="1.5"/>
-                  <circle r="5" fill="#ef4444"/>
-                  <text x="0" y="14" font-size="7" font-weight="600" fill="#fca5a5" text-anchor="middle">Baksha (Flooded)</text>
-                </g>
-
-                <!-- JAUNPUR NODE 5: Kerakat CHC (Green) -->
-                <g class="map-node-pin" transform="translate(330, 210)">
-                  <circle r="11" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5"/>
-                  <circle r="5" fill="#10b981"/>
-                  <text x="0" y="-8" font-size="7" font-weight="600" fill="#a7f3d0" text-anchor="middle">Kerakat (Pedia)</text>
-                </g>
-
-                <!-- 108 Ambulance Moving in Jaunpur (Route J1) -->
-                <g class="ambulance-marker" transform="translate(160, 205)">
-                  <rect x="-9" y="-5" width="18" height="10" rx="2" fill="#ff9933" stroke="#fff" stroke-width="1"/>
-                  <text x="0" y="3" font-size="5" font-weight="900" fill="#000" text-anchor="middle">108</text>
-                  <circle cx="-10" cy="-6" r="2.5" fill="#38bdf8">
-                    <animate attributeName="fill" values="#38bdf8;#ef4444;#38bdf8" dur="0.6s" repeatCount="indefinite"/>
-                  </circle>
-                </g>
-              </g>
-
-              <!-- ==============================================================
-                   LAYER 2: GORAKHPUR DISTRICT ROUTE CORRIDORS
-                   ============================================================== -->
-              <g class="gkp-route-layer">
-                <!-- Route G1: Kusumhi PHC -> GKP Civil -->
-                <path class="route-corridor critical-corridor" d="M60 110 Q140 80 220 50" fill="none" stroke-width="2.5" filter="url(#glow-red)"/>
-
-                <!-- Route G2: Bansgaon SDH -> GKP Civil -->
-                <path class="route-corridor green-corridor" d="M340 120 Q280 80 220 50" fill="none" stroke-width="3" filter="url(#glow-green)"/>
-
-                <!-- Route G3: Sahjanwa CHC -> GKP Civil -->
-                <path class="route-corridor caution-corridor" d="M90 30 Q160 40 220 50" fill="none" stroke-width="2" filter="url(#glow-amber)"/>
-
-                <!-- GORAKHPUR NODE 1: Gorakhpur Civil (Apex Red) -->
-                <g class="map-node-pin" transform="translate(220, 50)">
-                  <circle r="16" fill="rgba(239, 68, 68, 0.2)" stroke="#ef4444" stroke-width="1.5"/>
-                  <circle r="8" fill="#ef4444"/>
-                  <text x="0" y="3" font-size="7" font-weight="900" fill="#fff" text-anchor="middle">GKP</text>
-                  <text x="0" y="-12" font-size="8" font-weight="700" fill="#f87171" text-anchor="middle" font-family="'Outfit', sans-serif">GKP CIVIL (94%)</text>
-                </g>
-
-                <!-- GORAKHPUR NODE 2: Bansgaon SDH -->
-                <g class="map-node-pin" transform="translate(340, 120)">
-                  <circle r="11" fill="rgba(16, 185, 129, 0.2)" stroke="#10b981" stroke-width="1.5"/>
-                  <circle r="5" fill="#10b981"/>
-                  <text x="0" y="12" font-size="7" font-weight="600" fill="#6ee7b7" text-anchor="middle">Bansgaon (Ready)</text>
-                </g>
-
-                <!-- GORAKHPUR NODE 3: Kusumhi PHC -->
-                <g class="map-node-pin" transform="translate(60, 110)">
-                  <circle r="10" fill="rgba(239, 68, 68, 0.2)" stroke="#ef4444" stroke-width="1.5"/>
-                  <circle r="5" fill="#ef4444"/>
-                  <text x="0" y="12" font-size="7" font-weight="600" fill="#fca5a5" text-anchor="middle">Kusumhi (Drone)</text>
-                </g>
-
-                <!-- 108 Ambulance in Gorakhpur Route -->
-                <g class="ambulance-marker" transform="translate(280, 85)">
-                  <rect x="-9" y="-5" width="18" height="10" rx="2" fill="#047857" stroke="#fff" stroke-width="1"/>
-                  <text x="0" y="3" font-size="5" font-weight="900" fill="#fff" text-anchor="middle">108</text>
-                  <circle cx="-10" cy="-6" r="2.5" fill="#10b981">
-                    <animate attributeName="fill" values="#10b981;#67e8f9;#10b981" dur="0.8s" repeatCount="indefinite"/>
-                  </circle>
-                </g>
-              </g>
-
-              <!-- Express Corridor Link between Jaunpur & Gorakhpur -->
-              <path d="M210 230 L220 50" fill="none" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" stroke-dasharray="3 3"/>
-              <text x="225" y="145" font-size="7" fill="rgba(255, 255, 255, 0.4)" font-family="monospace">UP INTER-DISTRICT EXPRESS</text>
-            </svg>
-          </div>
-
-          <!-- Map Color Legend -->
-          <div class="map-legend">
-            <span class="legend-item">
-              <span class="legend-line" style="background: var(--status-critical);"></span>
-              <span>Critical Divert</span>
-            </span>
-            <span class="legend-item">
-              <span class="legend-line" style="background: var(--status-warning);"></span>
-              <span>Caution / Resupply</span>
-            </span>
-            <span class="legend-item">
-              <span class="legend-line" style="background: var(--status-stable);"></span>
-              <span>Green Corridor Clear</span>
-            </span>
-            <span class="legend-item">
-              <span class="legend-line" style="background: var(--brand-saffron);"></span>
-              <span>Jaunpur Hub</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- 2. Real-time Emergency Incident & Triage Queue -->
-        <div class="incident-stream-card">
-          <div class="section-title-wrap">
-            <div class="section-icon" style="color: var(--status-critical);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-            </div>
-            <div>
-              <h3 class="section-title" style="font-size: 1.05rem;">Active Emergency Triage Queue</h3>
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">Live Dispatches across UP East</span>
-            </div>
-          </div>
-
-          <div class="incidents-list">
-            
-            <!-- Jaunpur Incident 1: P1 Critical Highway Trauma -->
-            <div class="incident-item p1-critical">
-              <div class="inc-top">
-                <span class="inc-priority-tag p1">P1 CRITICAL &bull; JAUNPUR NH-31</span>
-                <span class="inc-time">01 min ago</span>
-              </div>
-              <p class="inc-desc">Multiple Head Trauma on Shahganj-Jaunpur Road &bull; 108 ALS #21 En-route</p>
-              <div class="inc-route-info">
-                <span>Origin: <strong>Shahganj Junction</strong></span>
-                <span class="inc-eta">ETA: 05 min &bull; Jaunpur Civil OT-1</span>
-              </div>
-            </div>
-
-            <!-- Jaunpur Incident 2: P1 Maternal Emergency -->
-            <div class="incident-item p1-critical">
-              <div class="inc-top">
-                <span class="inc-priority-tag p1">P1 CRITICAL &bull; MATERNAL</span>
-                <span class="inc-time">06 min ago</span>
-              </div>
-              <p class="inc-desc">Eclampsia with fetal distress from Baksha PHC to Jaunpur Women Hospital</p>
-              <div class="inc-route-info">
-                <span>Lock: <strong>Jaunpur SNCU Hub</strong></span>
-                <span class="inc-eta">ETA: 12 min &bull; 108 BLS #11</span>
-              </div>
-            </div>
-
-            <!-- Gorakhpur Incident 3: P2 Toxicology -->
-            <div class="incident-item p2-warning">
-              <div class="inc-top">
-                <span class="inc-priority-tag p2">P2 CAUTION &bull; GORAKHPUR</span>
-                <span class="inc-time">10 min ago</span>
-              </div>
-              <p class="inc-desc">Krait Snakebite Envenomation in Kusumhi Forest &bull; Drone air-drop active</p>
-              <div class="inc-route-info">
-                <span>Target: <strong>Kusumhi Tribal PHC</strong></span>
-                <span class="inc-eta">Drone ETA: 08 min</span>
-              </div>
-            </div>
-
-            <!-- Jaunpur Incident 4: P2 Oxygen Refill -->
-            <div class="incident-item p2-warning">
-              <div class="inc-top">
-                <span class="inc-priority-tag p2">P2 SUPPLY &bull; MARIAHU</span>
-                <span class="inc-time">16 min ago</span>
-              </div>
-              <p class="inc-desc">Mariahu CHC 40-Cylinder Cryogenic Manifold Refill Truck from Varanasi</p>
-              <div class="inc-route-info">
-                <span>Route: <strong>Varanasi-Jaunpur Expressway</strong></span>
-                <span class="inc-eta">ETA: 35 min</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <!-- 3. Cryogenic Liquid Medical Oxygen (LMO) Storage Monitor -->
-        <div class="oxygen-storage-card">
-          <div class="section-title-wrap">
-            <div class="section-icon" style="color: var(--brand-cyan);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l2 6H4z"/><path d="M4 9v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><line x1="10" x2="14" y1="13" y2="13"/></svg>
-            </div>
-            <div>
-              <h3 class="section-title" style="font-size: 1.05rem;">Regional LMO Cryogenic Telemetry</h3>
-              <span style="font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono);">Liquid Tanks & Pressure Gauges</span>
-            </div>
-          </div>
-
-          <div class="cryo-tanks-grid">
-            
-            <div class="cryo-tank-module">
-              <div class="tank-visual">
-                <div class="tank-liquid crit-liquid" style="height: 22%;"></div>
-                <span class="tank-bubble"></span>
-              </div>
-              <div class="tank-meta">
-                <span class="tank-title">Jaunpur Civil Tank</span>
-                <span class="tank-pct" style="color: var(--status-critical);">22% Full</span>
-                <span class="tank-pressure">Press: 2.3 Bar (Low)</span>
-              </div>
-            </div>
-
-            <div class="cryo-tank-module">
-              <div class="tank-visual">
-                <div class="tank-liquid" style="height: 88%;"></div>
-                <span class="tank-bubble"></span>
-              </div>
-              <div class="tank-meta">
-                <span class="tank-title">Shahganj Cryo Tank</span>
-                <span class="tank-pct" style="color: var(--status-stable);">88% Full</span>
-                <span class="tank-pressure">Press: 4.9 Bar (Safe)</span>
-              </div>
-            </div>
-
-            <div class="cryo-tank-module">
-              <div class="tank-visual">
-                <div class="tank-liquid crit-liquid" style="height: 18%;"></div>
-                <span class="tank-bubble"></span>
-              </div>
-              <div class="tank-meta">
-                <span class="tank-title">GKP Civil Tank</span>
-                <span class="tank-pct" style="color: var(--status-critical);">18% Full</span>
-                <span class="tank-pressure">Press: 2.1 Bar (Low)</span>
-              </div>
-            </div>
-
-            <div class="cryo-tank-module">
-              <div class="tank-visual">
-                <div class="tank-liquid" style="height: 80%;"></div>
-                <span class="tank-bubble"></span>
-              </div>
-              <div class="tank-meta">
-                <span class="tank-title">Machhlishahr Tank</span>
-                <span class="tank-pct" style="color: var(--status-stable);">80% Full</span>
-                <span class="tank-pressure">Press: 4.6 Bar (Safe)</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </aside>
-
-    </main>
-
-    <!-- =====================================================================
-         PURE CSS MODALS (Triggered via <label for="modal-id">)
-         ===================================================================== -->
-
-    <!-- Modal 1: 108 Emergency Route Dispatch & Bed Lock -->
-    <div class="modal-backdrop modal-dispatch-wrap" role="dialog" aria-modal="true" aria-labelledby="dispatch-title">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title-group">
-            <div class="section-icon" style="background: var(--status-critical-bg); color: var(--status-critical);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-            </div>
-            <div>
-              <h3 id="dispatch-title" style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: #fff;">108 Emergency Route Dispatch & Bed Lock</h3>
-              <p style="font-size: 0.78rem; color: var(--text-muted);">UP East 108 Network (Gorakhpur &bull; Jaunpur) &bull; National Ambulance Service</p>
-            </div>
-          </div>
-          <label for="modal-dispatch" class="modal-close-btn" aria-label="Close modal">&times;</label>
-        </div>
-
-        <form class="modal-form" onsubmit="return false;">
-          <div class="form-group-grid">
-            
-            <div class="form-field">
-              <label for="caller-name">Patient Name / Caller Alert</label>
-              <input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind" value="Virendra Yadav (Shahganj Pradhan Alert)">
-            </div>
-
-            <div class="form-field">
-              <label for="triage-level">Triage Emergency Priority</label>
-              <select id="triage-level" class="form-select">
-                <option value="p1" selected>🔴 P1 - Immediate Threat to Life (Trauma / Cardiac / O2 Drop)</option>
-                <option value="p2">🟡 P2 - Urgent (Fractures / Snakebite / High Maternal Eclampsia)</option>
-                <option value="p3">🟢 P3 - Delayed / Stable Transit / Dialysis Batch</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="pickup-village">Pickup Village / Taluka Location</label>
-              <input type="text" id="pickup-village" class="form-input" placeholder="Village Name, Post, Landmark" value="Baksha Gomti Ghat Tola #2, Near PWD Checkpost, Jaunpur">
-            </div>
-
-            <div class="form-field">
-              <label for="dest-hospital">Destination Hospital Selection (UP East)</label>
-              <select id="dest-hospital" class="form-select">
-                <option value="sdh-shahganj" selected>Sub-District Hospital Shahganj, Jaunpur (14 ICU Beds Free - RECOMMENDED)</option>
-                <option value="dch-jaunpur">Pt. Deendayal Upadhyay District Hospital Jaunpur (SURGE ALERT - 3 Beds Free)</option>
-                <option value="sdh-machhlishahr">Machhlishahr SDH, Jaunpur (11 Beds Free)</option>
-                <option value="chc-mariahu">Mariahu CHC, Jaunpur (First Referral Unit)</option>
-                <option value="sdh-bansgaon">Sub-District Hospital Bansgaon, Gorakhpur (18 ICU Beds Free)</option>
-                <option value="dch-gkp">Gorakhpur District Civil Hospital (SURGE ALERT - 4 Beds Free)</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="ambulance-type">108 Fleet Vehicle Type</label>
-              <select id="ambulance-type" class="form-select">
-                <option value="als" selected>Advanced Life Support (ALS) with Onboard Ventilator</option>
-                <option value="4x4">4x4 Heavy Rural Terrain Ambulance (Gomti Slush Ready)</option>
-                <option value="bls">Basic Life Support (BLS) Ambulance</option>
-                <option value="drone">Medical Drone Express (Antivenom & Blood Crossmatch Only)</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="abha-id">ABHA Digital Health ID (Optional)</label>
-              <input type="text" id="abha-id" class="form-input" placeholder="14-digit ABHA ID" value="91-8842-9901-4432">
-            </div>
-
-            <div class="form-field full-span">
-              <label for="clinical-notes">Emergency Clinical Notes & Vital Telemetry</label>
-              <textarea id="clinical-notes" class="form-textarea" rows="3" placeholder="Describe symptoms, vital signs, SpO2 levels...">SpO2 drop to 81%, severe crush trauma following highway collision near Shahganj. Immediate ventilator ICU bed required upon arrival at destination.</textarea>
-            </div>
-
-          </div>
-
-          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
-            <button type="button" class="dispatch-submit-btn">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-              <span>CONFIRM 108 DISPATCH & LOCK ICU BED</span>
-            </button>
-            <span style="font-size: 0.72rem; color: var(--text-dim); text-align: center;">
-              Auto-notifies Emergency Duty Medical Officer &bull; GPS Green Corridor Routing Dispatched
-            </span>
-          </div>
-        </form>
-      </div>
+    <!-- Navigation Hub Grid -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px;">
+      <a href="hospitals.html" style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 20px; text-decoration: none; color: inherit;">
+        <h3 style="font-family: var(--font-heading); color: var(--brand-cyan); font-size: 1.1rem; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 10h6"/><path d="M12 7v6"/></svg> Hospital Infrastructure &bull; 12 Facilities
+        </h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Manage 12 monitored facilities across Gorakhpur &amp; Jaunpur. Live search, triage asset filters, and Control Room Matrix Table.</p>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-cyan); margin-top: 12px; display: inline-block;">Open Hospital Grid &rarr;</span>
+      </a>
+
+      <a href="map.html" style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 20px; text-decoration: none; color: inherit;">
+        <h3 style="font-family: var(--font-heading); color: var(--brand-saffron); font-size: 1.1rem; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg> Emergency GIS Transit Map
+        </h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Interactive vector GIS map showing 108 ambulance corridors, Gomti &amp; Rapti rivers, and real-time triage queue.</p>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-saffron); margin-top: 12px; display: inline-block;">Open GIS Map &rarr;</span>
+      </a>
+
+      <a href="telemetry.html" style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 20px; text-decoration: none; color: inherit;">
+        <h3 style="font-family: var(--font-heading); color: var(--status-stable); font-size: 1.1rem; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> IoT Telemetry &amp; LMO Storage
+        </h3>
+        <p style="font-size: 0.82rem; color: var(--text-muted);">Cryogenic liquid oxygen pressure gauges, ABDM Sat-Link diagnostic logs, and automated CSV/FHIR report export.</p>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--status-stable); margin-top: 12px; display: inline-block;">Open Telemetry Hub &rarr;</span>
+      </a>
     </div>
 
-
-    <!-- Modal 2: Regional Telemetry Log & Network Diagnostics -->
-    <div class="modal-backdrop modal-telemetry-wrap" role="dialog" aria-modal="true" aria-labelledby="telemetry-title">
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title-group">
-            <div class="section-icon" style="background: rgba(6, 182, 212, 0.15); color: var(--brand-cyan);">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            </div>
-            <div>
-              <h3 id="telemetry-title" style="font-family: var(--font-heading); font-size: 1.25rem; font-weight: 700; color: #fff;">UP East Telemetry & Sat-Link Diagnostics</h3>
-              <p style="font-size: 0.78rem; color: var(--text-muted);">ABDM Hub &bull; Jaunpur & Gorakhpur IoT Oxygen & Cold-Chain Vitals</p>
-            </div>
-          </div>
-          <label for="modal-telemetry" class="modal-close-btn" aria-label="Close modal">&times;</label>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 14px; font-family: var(--font-mono); font-size: 0.8rem;">
-          
-          <div style="background: rgba(15, 23, 42, 0.9); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <div style="color: var(--status-stable); font-weight: 700; margin-bottom: 6px;">[OK] ABDM FHIR HEALTH DATA PIPELINE (JAUNPUR + GORAKHPUR)</div>
-            <div style="color: var(--text-muted); font-size: 0.74rem;">Latency: 38ms &bull; Encryption: AES-256 GCM &bull; Sync Rate: 2,480 packets/sec &bull; All 12 nodes online</div>
-          </div>
-
-          <div style="background: rgba(15, 23, 42, 0.9); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <div style="color: var(--status-warning); font-weight: 700; margin-bottom: 6px;">[WARN] IOT OXYGEN PRESSURE TELEMETRY #09 (MARIAHU CHC, JAUNPUR)</div>
-            <div style="color: var(--text-muted); font-size: 0.74rem;">Manifold Line Pressure at 2.8 Bar &bull; Automatic reserve cylinder manifold bank 02 engaged.</div>
-          </div>
-
-          <div style="background: rgba(15, 23, 42, 0.9); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <div style="color: var(--status-critical); font-weight: 700; margin-bottom: 6px;">[ALERT] GOMTI RIVER CAUSEWAY FLOOD ALERT (BAKSHA SECTOR)</div>
-            <div style="color: var(--text-muted); font-size: 0.74rem;">Water level 0.4m above roadbed. 108 Dispatch protocol switched to 4x4 Heavy Rural Ambulance units.</div>
-          </div>
-
-          <div style="background: rgba(15, 23, 42, 0.9); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
-            <div style="color: var(--brand-cyan); font-weight: 700; margin-bottom: 6px;">[INFO] COLD-CHAIN VACCINE & ANTIVENOM VAULT SYNC</div>
-            <div style="color: var(--text-muted); font-size: 0.74rem;">All 12 facilities operating between 2.6°C and 3.9°C &bull; Solar battery backups verified 100%.</div>
-          </div>
-
-        </div>
-
-        <div style="text-align: right; padding-top: 10px;">
-          <label for="modal-telemetry" class="action-btn-sm route-btn" style="padding: 8px 16px; font-size: 0.85rem;">
-            Dismiss Diagnostics
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- =====================================================================
-         APP FOOTER
-         ===================================================================== -->
-    <footer class="app-footer">
-      <div>
-        <strong>SevaRoute</strong> &copy; 2026 &bull; Rural Health Infrastructure & Emergency Routing Grid (Gorakhpur &bull; Jaunpur, Uttar Pradesh)
-      </div>
-      <div class="footer-initiatives">
-        <span class="initiative-pill">Ayushman Bharat Digital Mission (ABDM)</span>
-        <span style="color: var(--text-dim);">&bull;</span>
-        <span class="initiative-pill">108 National Ambulance Service (NAS)</span>
-        <span style="color: var(--text-dim);">&bull;</span>
-        <span class="initiative-pill">Government of Uttar Pradesh Health Dept</span>
-      </div>
+    <!-- Minimal Single-Line Footer -->
+    <footer class="app-minimal-footer" aria-label="Universal Site Footer">
+      <span>&copy; 2026 SevaRoute &bull; National Health Mission (NHM UP)</span>
+      <span class="footer-node">ABDM NODE: IN-UP-EAST-9940</span>
     </footer>
 
   </div>
 
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/telemetrySim.js"></script>
+  <script src="js/dispatchEngine.js"></script>
+  <script src="js/searchFilter.js"></script>
+  <script src="js/mapInteractivity.js"></script>
+  <script src="js/exportEngine.js"></script>
 </body>
 </html>

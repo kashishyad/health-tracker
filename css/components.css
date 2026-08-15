@@ -1,0 +1,782 @@
+/* ==========================================================================
+   SevaRoute — UI Component Styles
+   Path: css/components.css
+   ========================================================================== */
+
+/* 1. App Layout Container */
+.app-container {
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 16px 24px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all var(--transition-smooth);
+}
+
+/* 2. National Telemetry & Governance Topbar */
+.national-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 18px;
+  background: rgba(15,23,42,0.75);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.80rem;
+  color: var(--text-muted);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.national-badges {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.gov-emblem-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-pure);
+  letter-spacing: 0.3px;
+}
+
+.indian-flag-icon {
+  width: 20px;
+  height: 14px;
+  border-radius: 2px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.abdm-node-badge, .up-grid-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: rgba(6,182,212,0.10);
+  border: 1px solid rgba(6,182,212,0.30);
+  color: var(--brand-cyan);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.tier3-tag {
+  background: rgba(255,153,51,0.12);
+  border: 1px solid rgba(255,153,51,0.35);
+  color: var(--brand-saffron);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 0.70rem;
+  font-weight: 600;
+}
+
+.live-sat-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+.telemetry-waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+}
+.wave-bar {
+  width: 3px;
+  background: var(--brand-cyan);
+  border-radius: 1px;
+  animation: ecg-bar 1.2s infinite ease-in-out;
+}
+.wave-bar:nth-child(1) { animation-delay: 0.0s; }
+.wave-bar:nth-child(2) { animation-delay: 0.2s; }
+.wave-bar:nth-child(3) { animation-delay: 0.4s; }
+.wave-bar:nth-child(4) { animation-delay: 0.1s; }
+.wave-bar:nth-child(5) { animation-delay: 0.3s; }
+
+.sat-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--status-stable);
+  font-weight: 600;
+}
+
+.sat-spinner {
+  width: 8px; height: 8px;
+  border: 2px solid var(--status-stable);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+/* 3. Primary Brand Header */
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-badge {
+  width: 52px; height: 52px;
+  background: linear-gradient(135deg, var(--status-critical-dark) 0%, rgba(15,23,42,0.9) 100%);
+  border: 2px solid var(--status-critical);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 0 20px var(--status-critical-glow);
+}
+.logo-badge svg {
+  width: 28px; height: 28px;
+  stroke: #ffffff;
+  fill: none;
+  stroke-width: 2;
+}
+
+.brand-text h1 {
+  font-family: var(--font-heading);
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-pure);
+  line-height: 1.1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-accent { color: var(--brand-saffron); }
+.brand-hindi { font-size: 1.1rem; font-weight: 600; opacity: 0.7; }
+
+.brand-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.contrast-toggle-label, .modal-trigger-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(30,41,59,0.70);
+  border: 1px solid var(--border-medium);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+.contrast-toggle-label:hover, .modal-trigger-btn:hover {
+  background: rgba(51,65,85,0.90);
+  border-color: var(--brand-cyan);
+}
+
+.sos-call-btn {
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  border: 1px solid #f87171;
+  color: var(--text-pure);
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 20px var(--status-critical-glow);
+  animation: signal-pulse-critical 2s infinite;
+  transition: transform var(--transition-fast);
+}
+.sos-call-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* 4. District Corridor Switcher Nav */
+.district-corridor-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15,23,42,0.70);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.corridor-tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.corridor-tab-label {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  background: rgba(30,41,59,0.75);
+  border: 1px solid var(--border-medium);
+  color: var(--text-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+.corridor-tab-label:hover {
+  background: rgba(51,65,85,0.80);
+  color: var(--text-pure);
+}
+
+/* Active Corridor States */
+#corridor-all:checked     ~ .app-container .corridor-tab-label[for="corridor-all"],
+#corridor-gkp:checked     ~ .app-container .corridor-tab-label[for="corridor-gkp"],
+#corridor-jaunpur:checked ~ .app-container .corridor-tab-label[for="corridor-jaunpur"] {
+  background: linear-gradient(135deg, rgba(6,182,212,0.25) 0%, rgba(99,102,241,0.25) 100%);
+  border-color: var(--brand-cyan);
+  color: var(--text-pure);
+  box-shadow: 0 0 14px rgba(6,182,212,0.30);
+}
+
+/* 5. Live Emergency Incident Feed Ticker */
+.live-alert-ticker {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.ticker-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--status-critical);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  letter-spacing: 0.5px;
+}
+
+.ticker-beacon-dot {
+  width: 8px; height: 8px;
+  background: #fff;
+  border-radius: 50%;
+  animation: signal-pulse-critical 1.5s infinite;
+}
+
+.ticker-viewport {
+  overflow: hidden;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.ticker-track {
+  display: inline-block;
+  white-space: nowrap;
+  animation: marquee 38s linear infinite;
+  cursor: pointer;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  font-size: 0.78rem;
+  color: var(--text-main);
+}
+.ticker-dot-sep {
+  margin: 0 12px;
+  color: var(--status-critical);
+}
+
+/* 6. Vital Indicators KPI Grid */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.vital-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.vital-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-bright);
+  box-shadow: var(--shadow-elevated);
+}
+
+.vital-card.status-critical-theme { border-left: 5px solid var(--status-critical); animation: breath-critical 2.2s infinite; }
+.vital-card.status-warning-theme  { border-left: 5px solid var(--status-warning);  animation: breath-warning 3.5s infinite; }
+.vital-card.status-stable-theme   { border-left: 5px solid var(--status-stable);   animation: breath-stable 5s infinite; }
+.vital-card.status-cyan-theme     { border-left: 5px solid var(--brand-cyan); }
+
+.vital-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.vital-title {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vital-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+.vital-status-pill.critical { background: var(--status-critical-bg); color: var(--status-critical); border: 1px solid var(--status-critical-border); }
+.vital-status-pill.warning  { background: var(--status-warning-bg);  color: var(--status-warning);  border: 1px solid var(--status-warning-border); }
+.vital-status-pill.stable   { background: var(--status-stable-bg);   color: var(--status-stable);   border: 1px solid var(--status-stable-border); }
+.vital-status-pill.info     { background: rgba(6,182,212,0.12); color: var(--brand-cyan); border: 1px solid rgba(6,182,212,0.35); }
+
+.vital-value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.vital-number {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--text-pure);
+  line-height: 1;
+}
+.vital-unit {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.vital-bar-track {
+  height: 6px;
+  background: rgba(30,41,59,0.80);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.vital-bar-fill { height: 100%; border-radius: var(--radius-full); }
+.vital-bar-fill.critical { background: var(--status-critical); }
+.vital-bar-fill.warning  { background: var(--status-warning); }
+.vital-bar-fill.stable   { background: var(--status-stable); }
+.vital-bar-fill.cyan     { background: var(--brand-cyan); }
+
+.vital-subtext {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+/* 7. Sticky Status Summary Strip */
+.status-summary-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(11,17,32,0.90);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  position: sticky;
+  top: 10px;
+  z-index: 50;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.summary-critical { color: var(--status-critical); }
+.summary-warning  { color: var(--status-warning); }
+.summary-stable   { color: var(--status-stable); }
+.summary-total    { color: var(--text-main); }
+.summary-divider  { width: 1px; height: 14px; background: var(--border-medium); }
+
+/* 8. Dashboard Grid & Hospital Facility Cards */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 20px;
+}
+
+.hospitals-matrix-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.hospital-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-smooth);
+}
+.hospital-card.card-status-critical { border-left: 6px solid var(--status-critical); }
+.hospital-card.card-status-warning  { border-left: 6px solid var(--status-warning); }
+.hospital-card.card-status-stable   { border-left: 6px solid var(--status-stable); }
+
+.h-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.h-tier-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.h-district-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+}
+.h-district-pill.jaunpur { background: rgba(255,153,51,0.15); color: var(--brand-saffron); border: 1px solid rgba(255,153,51,0.3); }
+.h-district-pill.gkp     { background: rgba(6,182,212,0.15);  color: var(--brand-cyan);    border: 1px solid rgba(6,182,212,0.3); }
+
+.h-type-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: rgba(30,41,59,0.6);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: var(--radius-xs);
+}
+
+.nav-icon {
+  flex-shrink: 0;
+}
+
+.h-eta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  color: var(--brand-cyan);
+}
+
+.h-name {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-pure);
+  line-height: 1.2;
+}
+
+.h-location {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.h-metrics-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  background: rgba(11,17,32,0.60);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-bottom: 14px;
+}
+
+.h-metric-block { display: flex; flex-direction: column; gap: 4px; }
+.h-metric-label { display: flex; justify-content: space-between; font-size: 0.70rem; color: var(--text-dim); }
+.h-metric-value-wrap { display: flex; align-items: baseline; gap: 4px; }
+.h-metric-val { font-family: var(--font-mono); font-size: 1.15rem; font-weight: 800; }
+.h-metric-total { font-size: 0.70rem; color: var(--text-muted); }
+
+.mini-bar-track { height: 4px; background: rgba(30,41,59,0.8); border-radius: var(--radius-full); overflow: hidden; margin-top: 4px; }
+.mini-bar-fill { height: 100%; border-radius: var(--radius-full); }
+.mini-bar-fill.critical { background: var(--status-critical); }
+.mini-bar-fill.warning  { background: var(--status-warning); }
+.mini-bar-fill.stable   { background: var(--status-stable); }
+
+.doctors-roster-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.doc-tag { font-size: 0.72rem; color: var(--text-muted); background: rgba(30,41,59,0.4); padding: 2px 8px; border-radius: var(--radius-xs); }
+.doc-tag.active-doc { color: #a7f3d0; }
+
+.h-infra-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.infra-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.infra-badge { font-size: 0.70rem; padding: 2px 8px; border-radius: var(--radius-xs); }
+.infra-badge.passable { background: rgba(16,185,129,0.1); color: var(--status-stable); border: 1px solid rgba(16,185,129,0.25); }
+.infra-badge.alert    { background: rgba(239,68,68,0.1); color: var(--status-critical); border: 1px solid rgba(239,68,68,0.25); }
+.infra-badge.caution  { background: rgba(245,158,11,0.1); color: var(--status-warning); border: 1px solid rgba(245,158,11,0.25); }
+
+.card-actions-group { display: flex; gap: 8px; }
+.action-btn-sm { padding: 6px 12px; font-size: 0.76rem; font-weight: 700; border-radius: var(--radius-xs); cursor: pointer; border: none; }
+.route-btn { background: var(--brand-cyan); color: #000; }
+.saffron-btn { background: var(--brand-saffron); color: #000; }
+.divert-btn { background: var(--status-critical-bg); color: var(--status-critical); border: 1px solid var(--status-critical); }
+
+/* Section Header & Icon Styling */
+.section-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-pure);
+}
+
+/* ==========================================================================
+   MINIMALIST SINGLE-LINE FOOTER STYLES
+   ========================================================================== */
+.app-minimal-footer {
+  margin-top: 36px;
+  padding: 14px 4px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  color: var(--text-dimmer);
+}
+
+.app-minimal-footer .footer-node {
+  font-family: var(--font-mono);
+  font-size: 0.70rem;
+  color: var(--text-dim);
+}
+
+.section-counter {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   MULTI-PAGE HTML NAVIGATION BAR STYLES
+   ========================================================================== */
+.main-page-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.90);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.page-link-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.86rem;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.page-link-btn:hover {
+  background: rgba(30, 41, 59, 0.6);
+  color: var(--text-pure);
+}
+
+.page-link-btn.active {
+  background: linear-gradient(135deg, var(--brand-cyan) 0%, var(--brand-blue) 100%);
+  color: #000000;
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 16px var(--brand-cyan-glow);
+}
+.main-view-tab-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  backdrop-filter: blur(12px);
+  flex-wrap: wrap;
+}
+
+.main-tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+
+.main-tab-btn:hover {
+  background: rgba(30, 41, 59, 0.6);
+  color: var(--text-pure);
+}
+
+.main-tab-btn.active {
+  background: linear-gradient(135deg, var(--brand-cyan) 0%, var(--brand-blue) 100%);
+  color: #000000;
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 16px var(--brand-cyan-glow);
+}
+
+/* Tab View Isolation Rules */
+body[data-main-tab="hospitals"] #vitals-section,
+body[data-main-tab="hospitals"] .right-sidebar-stack {
+  display: none !important;
+}
+body[data-main-tab="hospitals"] .dashboard-main-grid {
+  grid-template-columns: 1fr;
+}
+
+body[data-main-tab="map"] #vitals-section,
+body[data-main-tab="map"] #hospitals-section {
+  display: none !important;
+}
+body[data-main-tab="map"] .dashboard-main-grid {
+  grid-template-columns: 1fr;
+}
+body[data-main-tab="map"] .right-sidebar-stack {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+body[data-main-tab="map"] .map-visualizer-card {
+  grid-column: span 2;
+}
+body[data-main-tab="map"] .map-viewport {
+  height: 440px;
+}
+
+body[data-main-tab="vitals"] #hospitals-section,
+body[data-main-tab="vitals"] .map-visualizer-card {
+  display: none !important;
+}
+body[data-main-tab="vitals"] .dashboard-main-grid {
+  grid-template-columns: 1fr;
+}
+body[data-main-tab="vitals"] .right-sidebar-stack {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+

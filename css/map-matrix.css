@@ -1,0 +1,363 @@
+/* ==========================================================================
+   SevaRoute — SVG GIS Map, Search Filters & Compact Matrix View
+   Path: css/map-matrix.css
+   ========================================================================== */
+
+/* 1. Right Sidebar Stack */
+.right-sidebar-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 2. Map Visualizer Card */
+.map-visualizer-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.map-viewport {
+  height: 310px;
+  background: #090e1a;
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  margin-top: 10px;
+}
+
+.map-grid-mesh {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(148,163,184,0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148,163,184,0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.radar-sweep-container {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 0deg at 50% 50%, rgba(6,182,212,0.15) 0deg, transparent 60deg, transparent 360deg);
+  animation: radar-spin 8s linear infinite;
+  pointer-events: none;
+}
+@keyframes radar-spin { 100% { transform: rotate(360deg); } }
+
+/* ==========================================================================
+   SLEEK NON-OVERLAPPING GIS PIN MARKERS & AMBULANCE BADGES
+   ========================================================================== */
+.leaflet-custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+.gis-pin-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-bright);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.7);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.gis-pin-wrapper:hover {
+  transform: scale(1.15);
+  background: rgba(30, 41, 59, 0.98);
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 16px rgba(6,182,212,0.5);
+  z-index: 9999 !important;
+}
+
+.gis-pin-wrapper.critical { border-color: rgba(239,68,68,0.6); }
+.gis-pin-wrapper.warning  { border-color: rgba(245,158,11,0.6); }
+.gis-pin-wrapper.stable   { border-color: rgba(16,185,129,0.6); }
+
+.gis-pin-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.gis-pin-dot.critical { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+.gis-pin-dot.warning  { background: #f59e0b; box-shadow: 0 0 8px #f59e0b; }
+.gis-pin-dot.stable   { background: #10b981; box-shadow: 0 0 8px #10b981; }
+
+.gis-pin-label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--text-pure);
+}
+
+.gis-pin-metric {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: rgba(30,41,59,0.8);
+}
+.gis-pin-metric.critical { color: #f87171; }
+.gis-pin-metric.warning  { color: #fde68a; }
+.gis-pin-metric.stable   { color: #6ee7b7; }
+
+.gis-amb-badge {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  border: 1px solid #ff9933;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  font-size: 0.70rem;
+  font-weight: 800;
+  box-shadow: 0 0 14px rgba(255,153,51,0.6);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.gis-amb-badge .amb-eta {
+  background: rgba(0,0,0,0.4);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  font-size: 0.65rem;
+}
+
+.map-svg-routes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Vector Corridors */
+.route-corridor { stroke-linecap: round; stroke-linejoin: round; }
+.green-corridor    { stroke: var(--status-stable); }
+.caution-corridor  { stroke: var(--status-warning); }
+.critical-corridor { stroke: var(--status-critical); }
+.saffron-corridor  { stroke: var(--brand-saffron); }
+
+.map-node-pin { cursor: pointer; transition: transform 0.25s ease; }
+.map-node-pin:hover { transform: scale(1.2); }
+
+.map-pin-highlight {
+  filter: drop-shadow(0 0 12px #06b6d4) !important;
+  transform: scale(1.25);
+  transform-origin: center;
+}
+
+.map-legend {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  font-size: 0.70rem;
+  color: var(--text-muted);
+}
+.legend-item { display: flex; align-items: center; gap: 4px; }
+.legend-line { width: 14px; height: 3px; border-radius: 2px; }
+
+/* 3. Toolbar Controls Row (Search, Asset Filter & View Switcher) */
+.toolbar-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.search-and-asset-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 280px;
+}
+
+.search-input-wrap {
+  position: relative;
+  flex: 1;
+}
+.search-input-wrap svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dim);
+}
+
+.global-search-input {
+  width: 100%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px 8px 36px;
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.80rem;
+  transition: var(--transition-fast);
+}
+.global-search-input:focus {
+  outline: none;
+  border-color: var(--brand-cyan);
+  box-shadow: 0 0 12px var(--brand-cyan-glow);
+}
+
+.asset-filter-select {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: #ffffff;
+  font-family: var(--font-body);
+  font-size: 0.80rem;
+  cursor: pointer;
+}
+
+.view-switcher-group {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.view-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-main);
+  font-size: 0.76rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-fast);
+}
+.view-btn.active {
+  background: var(--brand-cyan);
+  color: #000;
+  font-weight: 700;
+}
+
+/* 4. Compact Control Room Matrix View Table */
+.matrix-table-container {
+  margin-top: 16px;
+}
+
+.matrix-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.80rem;
+}
+
+.matrix-table th {
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--text-pure);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.70rem;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-medium);
+  white-space: nowrap;
+}
+
+.matrix-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+.matrix-table tr:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+/* 5. Incident Queue Stream & Cryo Oxygen Tanks */
+.incident-stream-card, .oxygen-storage-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.incidents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.incident-item {
+  background: rgba(11,17,32,0.60);
+  border-left: 4px solid var(--border-medium);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+}
+.incident-item.p1-critical { border-left-color: var(--status-critical); }
+.incident-item.p2-warning  { border-left-color: var(--status-warning); }
+
+.inc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.inc-priority-tag { font-size: 0.68rem; font-weight: 800; font-family: var(--font-mono); }
+.inc-desc { font-size: 0.78rem; color: var(--text-main); line-height: 1.3; }
+.inc-route-info { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.70rem; color: var(--text-dim); }
+
+.cryo-tanks-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.cryo-tank-module {
+  background: rgba(11,17,32,0.60);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tank-visual {
+  width: 24px; height: 54px;
+  background: rgba(30,41,59,0.8);
+  border: 1px solid var(--border-medium);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.tank-liquid { position: absolute; bottom: 0; width: 100%; background: var(--brand-cyan); border-radius: 0 0 10px 10px; transition: height 0.5s ease; }
+.tank-liquid.crit-liquid { background: var(--status-critical); }
+
+.tank-meta { display: flex; flex-direction: column; gap: 2px; }
+.tank-title { font-size: 0.76rem; font-weight: 700; color: var(--text-pure); }
+.tank-pct { font-size: 0.72rem; font-weight: 800; font-family: var(--font-mono); }

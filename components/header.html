@@ -1,0 +1,81 @@
+<!-- =====================================================================
+     SevaRoute Component: Header, Topbar & Navigation
+     Path: components/header.html
+     ===================================================================== -->
+
+<!-- National Telemetry & Governance Top Bar -->
+<header class="national-topbar">
+  <div class="national-badges">
+    <span class="gov-emblem-tag">
+      <!-- Authentic Indian National Flag SVG with Ashoka Chakra -->
+      <svg class="indian-flag-icon" viewBox="0 0 30 20" aria-label="Indian National Flag">
+        <rect width="30" height="6.67" y="0" fill="#FF9933"/>
+        <rect width="30" height="6.67" y="6.67" fill="#FFFFFF"/>
+        <rect width="30" height="6.67" y="13.33" fill="#138808"/>
+        <circle cx="15" cy="10" r="2.8" fill="none" stroke="#000080" stroke-width="0.5"/>
+        <circle cx="15" cy="10" r="0.4" fill="#000080"/>
+        <g stroke="#000080" stroke-width="0.25">
+          <line x1="15" y1="7.2" x2="15" y2="12.8"/>
+          <line x1="12.2" y1="10" x2="17.8" y2="10"/>
+          <line x1="13.02" y1="8.02" x2="16.98" y2="11.98"/>
+          <line x1="13.02" y1="11.98" x2="16.98" y2="8.02"/>
+          <line x1="12.37" y1="8.91" x2="17.63" y2="11.09"/>
+          <line x1="12.37" y1="11.09" x2="17.63" y2="8.91"/>
+          <line x1="13.91" y1="7.37" x2="16.09" y2="12.63"/>
+          <line x1="13.91" y1="12.63" x2="16.09" y2="7.37"/>
+          <line x1="14.47" y1="7.24" x2="15.53" y2="12.76"/>
+          <line x1="14.47" y1="12.76" x2="15.53" y2="7.24"/>
+          <line x1="12.24" y1="9.47" x2="17.76" y2="10.53"/>
+          <line x1="12.24" y1="10.53" x2="17.76" y2="9.47"/>
+        </g>
+      </svg>
+      NHM &bull; MoHFW
+    </span>
+    <span class="abdm-node-badge">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      ABDM: UP-EAST-9940
+    </span>
+    <span class="up-grid-badge">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      Gorakhpur &bull; Jaunpur
+    </span>
+  </div>
+
+  <div class="live-sat-telemetry">
+    <span class="sat-indicator">
+      <span class="sat-spinner" aria-hidden="true"></span>
+      NavIC 12/12 LOCKED
+    </span>
+  </div>
+</header>
+
+<!-- Primary Brand Header -->
+<header class="main-header">
+  <div class="brand-section">
+    <div class="logo-badge" aria-hidden="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+        <path d="M12 7v6"/><path d="M9 10h6"/>
+      </svg>
+    </div>
+    <div class="brand-text">
+      <h1>Seva<span class="brand-accent">Route</span> <span class="brand-hindi text-muted">| सेवारूट</span></h1>
+      <div class="brand-subtitle">
+        <span>Rural Health Emergency Visualizer</span>
+        <span class="tier3-tag">Tier-3 Grid</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+      🌐 English
+    </button>
+    <label for="toggle-emergency-contrast" class="contrast-toggle-label">
+      Sunlight Mode
+    </label>
+    <label for="modal-dispatch" class="sos-call-btn">
+      <span>108 SOS DISPATCH</span>
+    </label>
+  </div>
+</header>

@@ -1,0 +1,140 @@
+<!-- =====================================================================
+     SevaRoute Component: Modals (108 SOS Dispatch & Diagnostic Telemetry)
+     Path: components/modals.html
+     ===================================================================== -->
+
+<!-- Modal 1: 108 Emergency Route Dispatch & Bed Lock -->
+<div class="modal-backdrop modal-dispatch-wrap" role="dialog" aria-modal="true" aria-labelledby="dispatch-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="section-icon" style="background: var(--status-critical-bg); color: var(--status-critical);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <div>
+          <h3 id="dispatch-title" class="modal-title" data-i18n="dispatchModalTitle">108 Emergency Route Dispatch &amp; Bed Lock</h3>
+          <p class="text-mono-xs text-muted">UP East 108 Network (Gorakhpur &bull; Jaunpur) &bull; National Ambulance Service</p>
+        </div>
+      </div>
+      <label for="modal-dispatch" class="modal-close-btn" aria-label="Close modal">&times;</label>
+    </div>
+
+    <form class="modal-form" onsubmit="return false;">
+      <div class="form-group-grid">
+        <div class="form-field">
+          <label for="caller-name">Patient Name / Emergency Caller</label>
+          <input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind">
+        </div>
+        <div class="form-field">
+          <label for="triage-level">Clinical Priority (Triage Category)</label>
+          <select id="triage-level" class="form-select">
+            <option value="p1" selected>P1 - Immediate Threat to Life (Trauma / Cardiac / O2 Drop)</option>
+            <option value="p2">P2 - Urgent (Fractures / Snakebite / High Maternal Eclampsia)</option>
+            <option value="p3">P3 - Delayed / Stable Transit / Dialysis Batch</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="pickup-village">Pickup Village / GPS Landmark</label>
+          <input type="text" id="pickup-village" class="form-input" placeholder="Village Name, Post, Landmark">
+        </div>
+        <div class="form-field">
+          <label for="dest-hospital">Destination Hospital Allocation</label>
+          <select id="dest-hospital" class="form-select">
+            <option value="sdh-shahganj" selected>SDH Shahganj, Jaunpur — 14 ICU Free (RECOMMENDED)</option>
+            <option value="dch-jaunpur">Pt. Deendayal Upadhyay Jaunpur Civil (SURGE — 3 Free)</option>
+            <option value="sdh-machhlishahr">Machhlishahr SDH, Jaunpur — 11 Free</option>
+            <option value="chc-mariahu">Mariahu CHC, Jaunpur (First Referral)</option>
+            <option value="sdh-bansgaon">SDH Bansgaon, Gorakhpur — 18 ICU Free</option>
+            <option value="dch-gkp">Gorakhpur Civil Hospital (SURGE — 4 Free)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="ambulance-type">Ambulance Fleet Unit Type</label>
+          <select id="ambulance-type" class="form-select">
+            <option value="als" selected>Advanced Life Support (ALS) with Onboard Ventilator</option>
+            <option value="4x4">4x4 Heavy Rural Terrain Ambulance (Gomti Slush Ready)</option>
+            <option value="bls">Basic Life Support (BLS) Ambulance</option>
+            <option value="drone">Medical Drone Express (Antivenom &amp; Blood Only)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="abha-id">ABHA ID (Ayushman Bharat Health Account)</label>
+          <input type="text" id="abha-id" class="form-input" placeholder="14-digit ABHA ID (optional)">
+        </div>
+        <div class="form-field full-span">
+          <label for="clinical-notes">Emergency Clinical Notes &amp; Vital Telemetry</label>
+          <textarea id="clinical-notes" class="form-textarea" rows="3" placeholder="Symptoms, vital signs, SpO2..."></textarea>
+        </div>
+      </div>
+
+      <div class="dispatch-actions">
+        <button type="button" class="dispatch-submit-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          <span data-i18n="confirmDispatch">CONFIRM 108 DISPATCH &amp; LOCK ICU BED</span>
+        </button>
+        <span class="text-mono-xs text-dimmer dispatch-note">
+          Auto-notifies Emergency Duty Medical Officer &bull; GPS Green Corridor Routing Dispatched
+        </span>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal 2: Regional Telemetry Log & Network Diagnostics -->
+<div class="modal-backdrop modal-telemetry-wrap" role="dialog" aria-modal="true" aria-labelledby="telemetry-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <div class="section-icon" style="background: rgba(6,182,212,0.15); color: var(--brand-cyan);">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div>
+          <h3 id="telemetry-title" class="modal-title" data-i18n="telemetryTitle">UP East Telemetry &amp; Sat-Link Diagnostics</h3>
+          <p class="text-mono-xs text-muted">ABDM Hub &bull; Jaunpur &amp; Gorakhpur IoT Oxygen &amp; Cold-Chain Vitals</p>
+        </div>
+      </div>
+      <label for="modal-telemetry" class="modal-close-btn" aria-label="Close modal">&times;</label>
+    </div>
+
+    <!-- Severity Filter Pills -->
+    <div id="telemetry-severity-filters" class="telemetry-severity-filters" role="tablist" aria-label="Filter telemetry logs by severity">
+      <button type="button" class="tfilter-btn active" data-severity="all">ALL (5)</button>
+      <button type="button" class="tfilter-btn" data-severity="ok">[OK]</button>
+      <button type="button" class="tfilter-btn" data-severity="warn">[WARN]</button>
+      <button type="button" class="tfilter-btn" data-severity="alert">[ALERT]</button>
+      <button type="button" class="tfilter-btn" data-severity="offline">[OFFLINE]</button>
+    </div>
+
+    <div class="telemetry-log-list">
+      <div class="telemetry-log-entry status-ok" data-severity="ok">
+        <div class="tlog-status">[OK] ABDM FHIR HEALTH DATA PIPELINE (JAUNPUR + GORAKHPUR)</div>
+        <div class="tlog-detail">Latency: 38ms &bull; Encryption: AES-256 GCM &bull; Sync Rate: 2,480 packets/sec &bull; All 12 nodes online</div>
+      </div>
+      <div class="telemetry-log-entry status-warn" data-severity="warn">
+        <div class="tlog-status">[WARN] IOT OXYGEN PRESSURE TELEMETRY #09 (MARIAHU CHC)</div>
+        <div class="tlog-detail">Manifold Line Pressure at 2.8 Bar &bull; Reserve cylinder manifold bank 02 engaged.</div>
+      </div>
+      <div class="telemetry-log-entry status-alert" data-severity="alert">
+        <div class="tlog-status">[ALERT] GOMTI RIVER CAUSEWAY FLOOD ALERT (BAKSHA SECTOR)</div>
+        <div class="tlog-detail">Water level 0.4m above roadbed. 108 Dispatch switched to 4x4 Heavy Rural Ambulance.</div>
+      </div>
+      <div class="telemetry-log-entry status-info" data-severity="ok">
+        <div class="tlog-status">[INFO] COLD-CHAIN VACCINE &amp; ANTIVENOM VAULT SYNC</div>
+        <div class="tlog-detail">All 12 facilities between 2.6°C and 3.9°C &bull; Solar battery backups verified 100%.</div>
+      </div>
+      <div class="telemetry-log-entry status-offline" data-severity="offline">
+        <div class="tlog-status">[OFFLINE] SENSOR NODE #11 — KUSUMHI PHC POWER INVERTER</div>
+        <div class="tlog-detail skeleton-line">Awaiting reconnect &bull; Last seen 4 min ago &bull; <span class="skeleton-pill"></span></div>
+      </div>
+    </div>
+
+    <div class="telemetry-modal-footer">
+      <div class="telemetry-modal-actions">
+        <button type="button" id="btn-export-csv" class="action-btn-sm saffron-btn" data-i18n="exportCsv">Export CSV Log</button>
+        <button type="button" id="btn-export-fhir" class="action-btn-sm route-btn" data-i18n="exportFhir">Export ABDM FHIR JSON</button>
+        <button type="button" id="btn-export-pdf" class="action-btn-sm" style="background: rgba(255,255,255,0.1); color: var(--text-main);" data-i18n="printPdf">Print PDF Handover</button>
+      </div>
+      <label for="modal-telemetry" class="action-btn-sm route-btn" data-i18n="dismissDiag">Dismiss Diagnostics</label>
+    </div>
+  </div>
+</div>

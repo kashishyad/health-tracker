@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SevaRoute - Hospital Infrastructure Grid & Control Room Matrix for Gorakhpur and Jaunpur UP.">
+  <title>SevaRoute - Hospital Infrastructure &amp; Matrix | 12 Monitored Facilities</title>
+  <script>
+    (function() {
+      if (localStorage.getItem('sevaroute_theme') === 'light') {
+        document.documentElement.classList.add('light-theme-active');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Radios at Body Root -->
+  <input type="radio" name="district-corridor-filter" id="corridor-all" class="corridor-radio" checked>
+  <input type="radio" name="district-corridor-filter" id="corridor-gkp" class="corridor-radio">
+  <input type="radio" name="district-corridor-filter" id="corridor-jaunpur" class="corridor-radio">
+
+  <input type="radio" name="health-status-filter" id="filter-all" class="filter-radio" checked>
+  <input type="radio" name="health-status-filter" id="filter-critical" class="filter-radio">
+  <input type="radio" name="health-status-filter" id="filter-warning" class="filter-radio">
+  <input type="radio" name="health-status-filter" id="filter-stable" class="filter-radio">
+
+  <input type="checkbox" id="modal-dispatch" class="modal-checkbox">
+  <input type="checkbox" id="modal-telemetry" class="modal-checkbox">
+  <input type="checkbox" id="toggle-emergency-contrast" class="modal-checkbox">
+
+  <!-- 108 SOS Dispatch Modal -->
+  <div class="modal-backdrop modal-dispatch-wrap" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="section-icon" style="background: var(--status-critical-bg); color: var(--status-critical);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <div>
+            <h3 class="modal-title">108 Emergency Dispatch &amp; Bed Lock</h3>
+            <p class="text-mono-xs text-muted">UP East 108 Network &bull; Gorakhpur &amp; Jaunpur</p>
+          </div>
+        </div>
+        <label for="modal-dispatch" class="modal-close-btn">&times;</label>
+      </div>
+      <form class="modal-form" onsubmit="return false;">
+        <div class="form-group-grid">
+          <div class="form-field"><label>Patient Name</label><input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind"></div>
+          <div class="form-field"><label>Priority</label><select id="triage-level" class="form-select"><option value="p1">P1 - Immediate Threat</option><option value="p2">P2 - Urgent</option></select></div>
+          <div class="form-field"><label>Pickup Village</label><input type="text" id="pickup-village" class="form-input" placeholder="Village Name, Post, Landmark"></div>
+          <div class="form-field"><label>Destination Hospital</label><select id="dest-hospital" class="form-select"><option value="sdh-shahganj">SDH Shahganj (14 ICU Free)</option><option value="dch-jaunpur">Jaunpur Civil (3 Free)</option></select></div>
+          <div class="form-field"><label>Ambulance Type</label><select id="ambulance-type" class="form-select"><option value="als">ALS Ventilator Ambulance</option><option value="4x4">4x4 Heavy Rural</option></select></div>
+          <div class="form-field"><label>ABHA ID</label><input type="text" id="abha-id" class="form-input" placeholder="14-digit ABHA ID (optional)"></div>
+        </div>
+        <div class="dispatch-actions">
+          <button type="button" class="dispatch-submit-btn">CONFIRM 108 DISPATCH &amp; LOCK ICU BED</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="app-container">
+
+    <!-- Header & Topbar -->
+    <header class="national-topbar">
+      <div class="national-badges">
+        <span class="gov-emblem-tag">
+          <svg class="indian-flag-icon" viewBox="0 0 30 20" aria-label="Indian National Flag">
+            <rect width="30" height="6.67" y="0" fill="#FF9933"/>
+            <rect width="30" height="6.67" y="6.67" fill="#FFFFFF"/>
+            <rect width="30" height="6.67" y="13.33" fill="#138808"/>
+            <circle cx="15" cy="10" r="2.8" fill="none" stroke="#000080" stroke-width="0.5"/>
+            <circle cx="15" cy="10" r="0.4" fill="#000080"/>
+            <g stroke="#000080" stroke-width="0.25">
+              <line x1="15" y1="7.2" x2="15" y2="12.8"/>
+              <line x1="12.2" y1="10" x2="17.8" y2="10"/>
+              <line x1="13.02" y1="8.02" x2="16.98" y2="11.98"/>
+              <line x1="13.02" y1="11.98" x2="16.98" y2="8.02"/>
+            </g>
+          </svg>
+          NHM &bull; MoHFW
+        </span>
+        <span class="abdm-node-badge">ABDM: UP-EAST-9940</span>
+        <span class="up-grid-badge">Gorakhpur &bull; Jaunpur Sector</span>
+      </div>
+      <div class="live-sat-telemetry">
+        <span class="live-clock-text" style="font-family:var(--font-mono); color:var(--brand-cyan); font-weight:700;">--:--:-- IST</span>
+        <span class="sat-indicator"><span class="sat-spinner"></span>NavIC 12/12 LOCKED</span>
+      </div>
+    </header>
+
+    <header class="main-header">
+      <div class="brand-section">
+        <div class="logo-badge">
+          <svg viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M12 7v6"/><path d="M9 10h6"/></svg>
+        </div>
+        <div class="brand-text">
+          <h1>Seva<span class="brand-accent">Route</span> <span class="brand-hindi text-muted">| सेवारूट</span></h1>
+          <div class="brand-subtitle">Hospital Infrastructure &amp; Control Room Matrix</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+          <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> English
+        </button>
+        <label for="toggle-emergency-contrast" class="contrast-toggle-label">Field Contrast</label>
+        <label for="modal-dispatch" class="sos-call-btn">108 SOS DISPATCH</label>
+      </div>
+    </header>
+
+    <!-- Navigation Links -->
+    <nav class="main-page-nav" aria-label="Main Page Navigation">
+      <a href="index.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Executive Overview
+      </a>
+      <a href="hospitals.html" class="page-link-btn active">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 10h6"/><path d="M12 7v6"/></svg> Hospital Grid &amp; Matrix
+      </a>
+      <a href="map.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg> Emergency GIS Map
+      </a>
+      <a href="telemetry.html" class="page-link-btn">
+        <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> Telemetry &amp; Storage
+      </a>
+    </nav>
+
+    <!-- District Corridor Switcher Nav -->
+    <nav class="district-corridor-nav" aria-label="District Health Corridor Selection">
+      <div class="corridor-tabs-group">
+        <label for="corridor-all" class="corridor-tab-label"><span>All UP Districts (12)</span></label>
+        <label for="corridor-gkp" class="corridor-tab-label"><span class="live-pulse-dot" style="background: var(--brand-cyan);"></span><span>Gorakhpur Sector (6)</span></label>
+        <label for="corridor-jaunpur" class="corridor-tab-label"><span class="live-pulse-dot" style="background: var(--brand-saffron);"></span><span>Jaunpur Sector (6)</span></label>
+      </div>
+    </nav>
+
+    <!-- Hospital Grid Panel -->
+    <section class="section-panel" id="hospitals-section" style="margin-top: 16px;">
+      <div class="section-header-bar">
+        <div class="section-title-wrap">
+          <div class="section-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"/><path d="M10 9h4"/><path d="M12 7v4"/></svg>
+          </div>
+          <h2 class="section-title">Hospitals &amp; Health Centers</h2>
+          <span class="section-counter">12 Monitored Facilities</span>
+        </div>
+
+        <div class="filter-controls" role="tablist">
+          <label for="filter-all" class="filter-btn" role="tab">All Statuses</label>
+          <label for="filter-critical" class="filter-btn critical-btn" role="tab">Critical</label>
+          <label for="filter-warning" class="filter-btn warning-btn" role="tab">Warning</label>
+          <label for="filter-stable" class="filter-btn stable-btn" role="tab">Stable</label>
+        </div>
+      </div>
+
+      <!-- Live Search & Asset Filters Bar -->
+      <div class="matrix-filter-toolbar" style="margin-top: 14px; margin-bottom: 16px;">
+        <div class="search-box-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="global-search-input" class="global-search-input" placeholder="Search hospital name, doctor, district...">
+        </div>
+
+        <select id="asset-filter-select" class="asset-filter-select">
+          <option value="all">All Triage Filters</option>
+          <option value="icu_gt_5">ICU Free &gt; 5 Beds</option>
+          <option value="o2_gt_12">O2 Supply &gt; 12 Hours</option>
+          <option value="surgeons">Surgeons On Roster</option>
+          <option value="antivenom">Polyvalent Antivenom Ready</option>
+        </select>
+
+        <div class="view-switcher-group">
+          <button type="button" id="btn-view-cards" class="view-btn active">Cards</button>
+          <button type="button" id="btn-view-matrix" class="view-btn">Matrix Table</button>
+        </div>
+      </div>
+
+      <div id="compact-matrix-container" class="matrix-table-container" style="display:none;"></div>
+
+      <div class="hospitals-matrix-list">
+        <!-- Jaunpur Civil -->
+        <article class="hospital-card card-status-critical district-jaunpur" id="hospital-jaunpur-civil">
+          <div class="h-card-top">
+            <div class="h-identity">
+              <div class="h-tier-tags"><span class="h-district-pill jaunpur">Jaunpur</span><span class="h-type-badge dch">District Civil Hospital</span></div>
+              <h3 class="h-name">Pt. Deendayal Upadhyay District Hospital (Jaunpur Civil)</h3>
+              <div class="h-location">📍 Line Bazar, Jaunpur &bull; 250 Beds</div>
+            </div>
+            <div class="h-status-badge critical"><span class="live-pulse-dot critical"></span>CRITICAL SURGE (94% FULL)</div>
+          </div>
+          <div class="h-metrics-row">
+            <div class="h-metric-block"><div class="h-metric-label"><span>ICU Free</span><span class="text-critical">3 Free / 48</span></div><div class="h-metric-val text-critical">3</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>O2 Reserve</span><span class="text-critical">5.1 Hours</span></div><div class="h-metric-val text-critical">5.1h</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>Surgeons</span><span class="text-stable">5 Active</span></div><div class="h-metric-val text-stable">5</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>Antivenom</span><span class="text-stable">5 Vials</span></div><div class="h-metric-val text-stable">5</div></div>
+          </div>
+          <div class="h-infra-footer">
+            <div class="infra-badges"><span class="infra-badge alert">⚠️ 94% ICU Full</span><span class="infra-badge passable">🚦 Green Corridor Open</span></div>
+            <div class="card-actions-group"><label for="modal-dispatch" class="action-btn-sm divert-btn">⚡ 108 Route</label></div>
+          </div>
+        </article>
+
+        <!-- Shahganj SDH -->
+        <article class="hospital-card card-status-stable district-jaunpur" id="hospital-jaunpur-shahganj">
+          <div class="h-card-top">
+            <div class="h-identity">
+              <div class="h-tier-tags"><span class="h-district-pill jaunpur">Jaunpur</span><span class="h-type-badge sdh">Sub-District Hospital</span></div>
+              <h3 class="h-name">Sub-District Hospital (Shahganj Division, Jaunpur)</h3>
+              <div class="h-location">📍 Shahganj Junction &bull; 120 Beds</div>
+            </div>
+            <div class="h-status-badge stable"><span class="live-pulse-dot stable"></span>STABLE (50% FULL)</div>
+          </div>
+          <div class="h-metrics-row">
+            <div class="h-metric-block"><div class="h-metric-label"><span>ICU Free</span><span class="text-stable">14 Free / 28</span></div><div class="h-metric-val text-stable">14</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>O2 Reserve</span><span class="text-stable">40 Hours</span></div><div class="h-metric-val text-stable">40h</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>Surgeons</span><span class="text-stable">5 Active</span></div><div class="h-metric-val text-stable">5</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>Antivenom</span><span class="text-stable">12 Vials</span></div><div class="h-metric-val text-stable">12</div></div>
+          </div>
+          <div class="h-infra-footer">
+            <div class="infra-badges"><span class="infra-badge passable">✅ 14 Beds Ready</span><span class="infra-badge passable">🧪 O2 Tank 88%</span></div>
+            <div class="card-actions-group"><label for="modal-dispatch" class="action-btn-sm route-btn">📡 Lock ICU Bed</label></div>
+          </div>
+        </article>
+
+        <!-- Gorakhpur Civil -->
+        <article class="hospital-card card-status-critical district-gkp" id="hospital-dch-central">
+          <div class="h-card-top">
+            <div class="h-identity">
+              <div class="h-tier-tags"><span class="h-district-pill gkp">Gorakhpur</span><span class="h-type-badge dch">District Civil Hospital</span></div>
+              <h3 class="h-name">District Civil Hospital (Gorakhpur Central)</h3>
+              <div class="h-location">📍 Civil Lines, Gorakhpur &bull; 300 Beds</div>
+            </div>
+            <div class="h-status-badge critical"><span class="live-pulse-dot critical"></span>CRITICAL SURGE (94% FULL)</div>
+          </div>
+          <div class="h-metrics-row">
+            <div class="h-metric-block"><div class="h-metric-label"><span>ICU Free</span><span class="text-critical">4 Free / 64</span></div><div class="h-metric-val text-critical">4</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>O2 Reserve</span><span class="text-critical">4.2 Hours</span></div><div class="h-metric-val text-critical">4.2h</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>Surgeons</span><span class="text-stable">4 Active</span></div><div class="h-metric-val text-stable">4</div></div>
+            <div class="h-metric-block"><div class="h-metric-label"><span>Antivenom</span><span class="text-stable">8 Vials</span></div><div class="h-metric-val text-stable">8</div></div>
+          </div>
+          <div class="h-infra-footer">
+            <div class="infra-badges"><span class="infra-badge alert">⚠️ Low Oxygen</span></div>
+            <div class="card-actions-group"><label for="modal-dispatch" class="action-btn-sm divert-btn">⚡ 108 Route</label></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Minimal Single-Line Footer -->
+    <footer class="app-minimal-footer" aria-label="Universal Site Footer">
+      <span>&copy; 2026 SevaRoute &bull; National Health Mission (NHM UP)</span>
+      <span class="footer-node">ABDM NODE: IN-UP-EAST-9940</span>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/telemetrySim.js"></script>
+  <script src="js/dispatchEngine.js"></script>
+  <script src="js/searchFilter.js"></script>
+  <script src="js/mapInteractivity.js"></script>
+  <script src="js/exportEngine.js"></script>
+</body>
+</html>

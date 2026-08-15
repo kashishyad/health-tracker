@@ -1,0 +1,96 @@
+<!-- =====================================================================
+     SevaRoute Component: Real-World GIS Leaflet Map & Incident Queue
+     Path: components/map-incidents.html
+     ===================================================================== -->
+
+<aside class="right-sidebar-stack" aria-label="Emergency Transit Routing &amp; Feeds">
+
+  <!-- Real-time GIS Vector Transit Map -->
+  <div class="map-visualizer-card">
+    <div class="section-title-wrap">
+      <div class="section-icon" style="color: var(--brand-saffron);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg>
+      </div>
+      <div>
+        <h3 class="section-title map-section-title">Real-World GIS Emergency Map</h3>
+        <span class="text-mono-xs text-muted">Gorakhpur &amp; Jaunpur District Grid</span>
+      </div>
+    </div>
+
+    <!-- Leaflet Container -->
+    <div id="gis-leaflet-map" style="height: 320px; width: 100%; border-radius: var(--radius-md); overflow: hidden; margin-top: 10px; border: 1px solid var(--border-subtle);"></div>
+
+    <div class="map-legend">
+      <span class="legend-item"><span class="legend-line" style="background: var(--status-critical);"></span><span>Critical Surge</span></span>
+      <span class="legend-item"><span class="legend-line" style="background: var(--status-warning);"></span><span>Caution Alert</span></span>
+      <span class="legend-item"><span class="legend-line" style="background: var(--status-stable);"></span><span>Green Corridor</span></span>
+    </div>
+  </div>
+
+  <!-- Active Emergency Triage Queue -->
+  <div class="incident-stream-card">
+    <div class="section-title-wrap">
+      <div class="section-icon" style="color: var(--status-critical);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+      </div>
+      <div>
+        <h3 class="section-title incident-section-title">Emergency Queue</h3>
+        <span class="text-mono-xs text-muted">Live 108 Dispatches</span>
+      </div>
+    </div>
+
+    <div class="incidents-list">
+      <div class="incident-item p1-critical">
+        <div class="inc-top"><span class="inc-priority-tag p1">P1 CRITICAL &bull; NH-31</span><span class="inc-time text-mono-xs">1m ago</span></div>
+        <p class="inc-desc">Highway collision &bull; 108 ALS #21 En-route</p>
+        <div class="inc-route-info"><span class="text-mono-xs">To: <strong>Jaunpur Civil</strong></span><span class="inc-eta text-mono-xs">ETA: 05 min</span></div>
+      </div>
+
+      <div class="incident-item p1-critical">
+        <div class="inc-top"><span class="inc-priority-tag p1">P1 MATERNAL</span><span class="inc-time text-mono-xs">6m ago</span></div>
+        <p class="inc-desc">Eclampsia transfer from Baksha PHC</p>
+        <div class="inc-route-info"><span class="text-mono-xs">To: <strong>Jaunpur Women</strong></span><span class="inc-eta text-mono-xs">ETA: 12 min</span></div>
+      </div>
+
+      <div class="incident-item p2-warning">
+        <div class="inc-top"><span class="inc-priority-tag p2">P2 SNAKEBITE</span><span class="inc-time text-mono-xs">10m ago</span></div>
+        <p class="inc-desc">Krait envenomation &bull; Drone drop active</p>
+        <div class="inc-route-info"><span class="text-mono-xs">To: <strong>Kusumhi PHC</strong></span><span class="inc-eta text-mono-xs">Drone: 08 min</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Oxygen Tank Storage -->
+  <div class="oxygen-storage-card">
+    <div class="section-title-wrap">
+      <div class="section-icon" style="color: var(--brand-cyan);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12l2 6H4z"/><path d="M4 9v10a2 2 0 0 1 2 2h12a2 2 0 0 1 2-2V9"/><line x1="10" x2="14" y1="13" y2="13"/></svg>
+      </div>
+      <div>
+        <h3 class="section-title oxygen-section-title">Cryo Tank Telemetry</h3>
+        <span class="text-mono-xs text-muted">LMO Pressure Gauges</span>
+      </div>
+    </div>
+
+    <div class="cryo-tanks-grid">
+      <div class="cryo-tank-module">
+        <div class="tank-visual" role="img"><div class="tank-liquid crit-liquid" style="height: 22%;"></div></div>
+        <div class="tank-meta">
+          <span class="tank-title">Jaunpur Civil</span>
+          <span class="tank-pct text-critical">22%</span>
+          <span class="tank-pressure text-mono-xs">2.3 Bar</span>
+        </div>
+      </div>
+
+      <div class="cryo-tank-module">
+        <div class="tank-visual" role="img"><div class="tank-liquid" style="height: 88%;"></div></div>
+        <div class="tank-meta">
+          <span class="tank-title">Shahganj SDH</span>
+          <span class="tank-pct text-stable">88%</span>
+          <span class="tank-pressure text-mono-xs">4.9 Bar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</aside>

@@ -1,73 +1,111 @@
-# 🚑 SevaRoute — Rural Health Infrastructure Tracker
+# 🚑 SevaRoute (सेवारूट) — Rural Health Infrastructure & 108 Emergency Command Visualizer
 
-**SevaRoute (सेवारूट)** is an emergency routing and health resource visualizer designed for Indian rural networks, Tier-3 cities, and village primary healthcare systems (aligned with the **National Health Mission**, **Ayushman Bharat Digital Mission (ABDM)**, and **108 National Ambulance Service**).
-
-Built purely with **Semantic HTML5 & Vanilla CSS3** (100% self-contained, zero external JS dependencies).
+**SevaRoute (सेवारूट)** is a high-performance, real-time regional health infrastructure tracker and 108 emergency routing command visualizer built for Eastern Uttar Pradesh (**Gorakhpur & Jaunpur Health Corridors**). Aligned with the **National Health Mission (NHM UP)**, **Ayushman Bharat Digital Mission (ABDM)**, and the **108 National Ambulance Service**.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Architectural Features
 
-- **Health Status Color System**:
-  - 🔴 **Critical Red** (`#ef4444`): High ICU occupancy (>90%), oxygen reserve < 6h, emergency divert alerts, low antivenom.
-  - 🟡 **Warning Amber** (`#f59e0b`): ICU occupancy 70–90%, oxygen reserve 6–18h, transit/weather delays.
-  - 🟢 **Stable Green** (`#10b981`): ICU capacity available, oxygen > 24h, full trauma team active, green corridor route open.
-- **Real-Time CSS `@keyframes` Telemetry Signals**:
-  - Concentric glowing radar waves (`signal-pulse`) around facility beacons and KPI badges.
-  - Breathing glow on active hospital cards (`breath-critical`, `breath-warning`, `breath-stable`).
-  - Shimmering gradient flow along ICU and Oxygen capacity progress bars.
-  - 360° tactical radar sweep across the GIS rural topology map.
-  - Flowing route animations indicating active 108 ambulance green corridors.
-  - High-visibility emergency beacon strobes on en-route vehicles.
-  - Smooth live emergency incident dispatch feed ticker.
-- **Multi-District Support**:
-  - **Gorakhpur Division (Terai Corridor)**: District Civil Hospital Central, Sub-District Hospital Bansgaon, Sahjanwa CHC, Kusumhi Tribal PHC, Pipraich Taluka Hospital, Mobile Field Unit #04.
-  - **Jaunpur District (Gomti River Basin Corridor)**: Pt. Deendayal Upadhyay District Hospital (Jaunpur Civil), Shahganj SDH, Mariahu CHC, Machhlishahr SDH, Baksha PHC, Kerakat CHC.
-- **Dual-Corridor SVG GIS Transit Visualizer**: Renders the Gomti River basin, NH-31 expressway, Jaunpur central hub, moving 108 ambulances, and green corridor routes.
-- **Pure CSS Interactive Controls**:
-  - Multi-district sector tabs (All UP Districts, Gorakhpur Sector, Jaunpur Sector).
-  - Health status filter tabs (All Statuses, Critical Alerts, Caution / Low O2, Ready).
-  - Field Sunlight / High-Contrast Emergency Mode toggle.
-  - Checkbox-backed modal sheets for **108 Emergency Route Dispatch & Bed Lock** and **Network Diagnostics & Sat-Link Telemetry Logs**.
+### 1. 🗺️ Authentic Leaflet GIS Command Map
+- Built with **Leaflet.js 1.9.4** over high-resolution **CartoDB Dark Matter GIS tiles**.
+- Geographically accurate latitude/longitude coordinates for **12 monitored facilities** in Eastern UP (Gorakhpur Central, Shahganj, Jaunpur Civil, Machhlishahr, Mariahu, Bansgaon, etc.).
+- Active highway polyline corridors (**NH-31** and **NH-28**) with animated 108 ALS vehicle markers.
+- Anti-overlapping status pins (`gis-pin-wrapper`) ensuring zero marker text collisions.
+
+### 2. 📄 4 Isolated Navigation Pages
+- **`index.html` (Executive Overview)**: High-level regional KPI metrics, active alert tickers, and primary infrastructure summary.
+- **`hospitals.html` (Monitored Facilities Grid & Matrix Table)**: Filterable hospital cards, doctor rosters, ICU bed capacity, and compact matrix control table.
+- **`map.html` (Tactical GIS Command Map)**: Full-height interactive Leaflet GIS map with active 108 Emergency Triage Stream.
+- **`telemetry.html` (LMO Oxygen Tanks & ABDM Sat-Link Diagnostics)**: Real-time liquid oxygen storage tank levels (LMO Cryo) and cold-chain IoT diagnostic logs.
+
+### 3. 🎨 Zero-FOUC Theme Engine (`localStorage` Persistence)
+- Persistent **Dark Mode** and **High-Contrast Field Sunlight Mode** synced seamlessly across all 4 pages.
+- Zero-FOUC (Flash of Unstyled Content) head script reads `sevaroute_theme` before DOM render.
+- High-contrast color tokens exceeding **WCAG 2.1 AA** standards for outdoor daylight readability.
+
+### 4. 🇮🇳 Authentic Tiranga Flag & 100% SVG Vector Icons
+- Replaced all emojis with **100% clean SVG vector icons** (`<svg viewBox="0 0 24 24">`).
+- Features the official **Indian Tiranga SVG Flag** including the 24-spoke Navy Blue Ashoka Chakra (`#000080`).
+
+### 5. ⏱️ 12-Hour AM/PM Real-Time Clock & Keyboard Hotkeys
+- Real-time topbar clock (`10:53:05 PM IST`) updated every second.
+- **Global Keyboard Hotkeys**:
+  - <kbd>Alt</kbd> + <kbd>S</kbd> — Open/Close 108 SOS Dispatch Modal.
+  - <kbd>Alt</kbd> + <kbd>T</kbd> — Toggle Field Contrast Sunlight Mode.
+  - <kbd>Alt</kbd> + <kbd>L</kbd> — Toggle Language (English / Hindi).
+
+### 6. 🛡️ Real-Time Input Validation & ICU Bed Lock
+- Real-time character length & numeric validation on Patient Name ($\ge 2$), Pickup Village ($\ge 3$), and ABHA ID.
+- Glowing red borders (`.input-error`), shake animations (`inputShake`), and inline helper text.
+- Automatic ICU bed deduction and live bed reservation upon dispatch confirmation.
 
 ---
 
-## 📁 Repository Structure
+## 📁 Codebase Directory Layout
 
 ```
-.
-├── index.html        # Main dashboard interface with all 12 facilities, SVG map & modals
-├── style.css         # Complete CSS design system, color variables & @keyframes
-└── README.md         # Documentation & deployment guide
+health-tracker/
+├── index.html            # Executive Overview Dashboard
+├── hospitals.html        # Hospital Facility Grid & Control Matrix
+├── map.html              # Tactical Leaflet GIS Map & Active 108 Queue
+├── telemetry.html        # Liquid Oxygen Cryo Storage & ABDM Sat-Link
+├── style.css             # Main Entry CSS Sheet (Imports sub-sheets)
+├── css/
+│   ├── base.css          # Design tokens, variables, typography & resets
+│   ├── components.css    # Topbar, brand header, vitals grid, minimal footer
+│   ├── map-matrix.css    # Leaflet pins, search toolbar, matrix table & feeds
+│   └── themes.css        # Modal sheets, toast engine & Sunlight Mode overrides
+├── js/
+│   ├── app.js            # Core state, theme engine, hotkeys, clock & language
+│   ├── mapInteractivity.js # Leaflet GIS initialization, pins & route lines
+│   └── dispatchEngine.js # 108 SOS dispatch form validation & bed locking
+└── components/
+    ├── header.html       # Shared header component
+    ├── footer.html       # Shared minimal single-line footer
+    ├── modals.html       # Shared dispatch & telemetry modals
+    └── map-incidents.html # Shared emergency incident stream card
 ```
 
 ---
 
 ## 🚀 How to Run Locally
 
-Since this project is built exclusively with HTML and CSS, simply open `index.html` in any modern web browser:
+Because SevaRoute uses standard HTML, CSS, and ES6 JavaScript, no build step or node compilation is required:
 
-- Double click `index.html` in your file explorer, OR
-- Serve with any static web server:
-  ```bash
-  # Python
-  python -m http.server 3000
+### Option 1: Direct File Opening
+Double-click `index.html` or drag it into any modern web browser (Chrome, Firefox, Safari, Edge).
 
-  # Node
-  npx serve .
-  ```
+### Option 2: Static Web Server
+```bash
+# Python 3
+python -m http.server 3000
+
+# Node.js
+npx serve .
+```
+Navigate to `http://localhost:3000` in your web browser.
 
 ---
 
-## 🏛️ Compliances & Alignments
+## ⌨️ Emergency Keyboard Shortcuts
 
+| Hotkey | Action | Description |
+| :---: | :--- | :--- |
+| <kbd>Alt</kbd> + <kbd>S</kbd> | **108 Emergency Dispatch** | Opens the emergency dispatch modal for immediate ICU bed reservation. |
+| <kbd>Alt</kbd> + <kbd>T</kbd> | **Toggle Theme** | Switches between Dark Mode and High-Contrast Field Sunlight Mode. |
+| <kbd>Alt</kbd> + <kbd>L</kbd> | **Toggle Language** | Switches system UI between English and Hindi (हिंदी). |
+
+---
+
+## 🏛️ Standard Compliance Alignment
+
+- **National Health Mission (NHM UP)**
 - **Ayushman Bharat Digital Mission (ABDM)**
-- **108 National Ambulance Service (NAS)**
+- **108 National Ambulance Service (NAS UP)**
 - **Ministry of Health and Family Welfare (MoHFW)**
-- **National Health Authority (NHA)**
 
 ---
 
 ## 📄 License
 
-MIT License &copy; 2026 SevaRoute Contributors.
+MIT License &copy; 2026 SevaRoute Contributors. Aligned with National Health Mission (NHM UP).
