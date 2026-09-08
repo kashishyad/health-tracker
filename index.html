@@ -4,16 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="SevaRoute - Executive Regional Health Infrastructure Tracker for Gorakhpur and Jaunpur UP.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org; connect-src 'self' https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org;">
   <title>SevaRoute - Executive Overview | Rural Health Grid</title>
-  <script>
-    (function() {
-      if (localStorage.getItem('sevaroute_theme') === 'light') {
-        document.documentElement.classList.add('light-theme-active');
-      }
-    })();
-  </script>
+  <script src="js/theme-init.js?v=20260908"></script>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260908-11">
 </head>
 <body>
 
@@ -37,7 +33,7 @@
         </div>
         <label for="modal-dispatch" class="modal-close-btn">&times;</label>
       </div>
-      <form class="modal-form" onsubmit="return false;">
+      <form class="modal-form">
         <div class="form-group-grid">
           <div class="form-field"><label>Patient Name</label><input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind"></div>
           <div class="form-field"><label>Priority</label><select id="triage-level" class="form-select"><option value="p1">P1 - Immediate Threat</option><option value="p2">P2 - Urgent</option></select></div>
@@ -94,7 +90,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+        <button type="button" id="btn-lang-toggle" class="lang-toggle-btn">
           <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> English
         </button>
         <label for="toggle-emergency-contrast" class="contrast-toggle-label">Field Contrast</label>
@@ -131,6 +127,11 @@
           <span class="ticker-item"><strong>HIGHWAY TRAUMA:</strong> NH-31 Shahganj &bull; 108 ALS #21 dispatched to Jaunpur Civil</span>
         </div>
       </div>
+    </div>
+
+    <div class="dashboard-data-status" role="status" aria-label="Dashboard data source">
+      <span class="dashboard-data-badge">DEMO TELEMETRY</span>
+      <span>Operational metrics are simulated locally for workflow demonstration.</span>
     </div>
 
     <!-- Regional KPI Vitals Grid -->
@@ -177,29 +178,29 @@
     </section>
 
     <!-- Navigation Hub Grid -->
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 24px;">
-      <a href="hospitals.html" style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 20px; text-decoration: none; color: inherit;">
-        <h3 style="font-family: var(--font-heading); color: var(--brand-cyan); font-size: 1.1rem; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+    <div class="overview-hub-grid">
+      <a href="hospitals.html" class="overview-hub-card hub-cyan">
+        <h3>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/><path d="M9 10h6"/><path d="M12 7v6"/></svg> Hospital Infrastructure &bull; 12 Facilities
         </h3>
-        <p style="font-size: 0.82rem; color: var(--text-muted);">Manage 12 monitored facilities across Gorakhpur &amp; Jaunpur. Live search, triage asset filters, and Control Room Matrix Table.</p>
-        <span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-cyan); margin-top: 12px; display: inline-block;">Open Hospital Grid &rarr;</span>
+        <p>Manage 12 monitored facilities across Gorakhpur &amp; Jaunpur. Live search, triage asset filters, and Control Room Matrix Table.</p>
+        <span class="hub-link">Open Hospital Grid &rarr;</span>
       </a>
 
-      <a href="map.html" style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 20px; text-decoration: none; color: inherit;">
-        <h3 style="font-family: var(--font-heading); color: var(--brand-saffron); font-size: 1.1rem; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+      <a href="map.html" class="overview-hub-card hub-saffron">
+        <h3>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" x2="9" y1="3" y2="18"/><line x1="15" x2="15" y1="6" y2="21"/></svg> Emergency GIS Transit Map
         </h3>
-        <p style="font-size: 0.82rem; color: var(--text-muted);">Interactive vector GIS map showing 108 ambulance corridors, Gomti &amp; Rapti rivers, and real-time triage queue.</p>
-        <span style="font-size: 0.8rem; font-weight: 700; color: var(--brand-saffron); margin-top: 12px; display: inline-block;">Open GIS Map &rarr;</span>
+        <p>Interactive vector GIS map showing 108 ambulance corridors, Gomti &amp; Rapti rivers, and real-time triage queue.</p>
+        <span class="hub-link">Open GIS Map &rarr;</span>
       </a>
 
-      <a href="telemetry.html" style="background: var(--bg-card); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 20px; text-decoration: none; color: inherit;">
-        <h3 style="font-family: var(--font-heading); color: var(--status-stable); font-size: 1.1rem; margin-bottom: 8px; display:flex; align-items:center; gap:8px;">
+      <a href="telemetry.html" class="overview-hub-card hub-stable">
+        <h3>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> IoT Telemetry &amp; LMO Storage
         </h3>
-        <p style="font-size: 0.82rem; color: var(--text-muted);">Cryogenic liquid oxygen pressure gauges, ABDM Sat-Link diagnostic logs, and automated CSV/FHIR report export.</p>
-        <span style="font-size: 0.8rem; font-weight: 700; color: var(--status-stable); margin-top: 12px; display: inline-block;">Open Telemetry Hub &rarr;</span>
+        <p>Cryogenic liquid oxygen pressure gauges, ABDM Sat-Link diagnostic logs, and automated CSV/FHIR report export.</p>
+        <span class="hub-link">Open Telemetry Hub &rarr;</span>
       </a>
     </div>
 
@@ -213,11 +214,13 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/telemetrySim.js"></script>
-  <script src="js/dispatchEngine.js"></script>
-  <script src="js/searchFilter.js"></script>
-  <script src="js/mapInteractivity.js"></script>
-  <script src="js/exportEngine.js"></script>
+  <script src="js/facilityRegistry.js?v=20260908-2"></script>
+  <script src="js/app.js?v=20260908-5"></script>
+  <script src="js/telemetryAdapter.js?v=20260908"></script>
+  <script src="js/telemetrySim.js?v=20260908-6"></script>
+  <script src="js/dispatchEngine.js?v=20260908-6"></script>
+  <script src="js/searchFilter.js?v=20260908-5"></script>
+  <script src="js/mapInteractivity.js?v=20260908-5"></script>
+  <script src="js/exportEngine.js?v=20260908"></script>
 </body>
 </html>
