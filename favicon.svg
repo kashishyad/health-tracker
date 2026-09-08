@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Rounded square background with gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b91c1c"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="url(#bg)"/>
+  <!-- Heart shape -->
+  <path d="M16 24 C16 24 7 18.5 7 12.5 A5 5 0 0 1 16 10.2 A5 5 0 0 1 25 12.5 C25 18.5 16 24 16 24Z"
+        fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Plus/cross inside heart -->
+  <line x1="16" y1="13" x2="16" y2="19" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="13" y1="16" x2="19" y2="16" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+</svg>

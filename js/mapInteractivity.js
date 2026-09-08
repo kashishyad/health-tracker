@@ -5,29 +5,48 @@
 
 (function () {
   'use strict';
-
-  // Facility Geographical Coordinate Registry
-  const FACILITY_COORDS = {
-    'hospital-jaunpur-civil':      { lat: 25.7464, lng: 82.6837, shortName: 'Jaunpur Civil Apex', status: 'critical', beds: '3 Free', o2: '5.1h' },
-    'hospital-jaunpur-shahganj':    { lat: 26.0526, lng: 82.6908, shortName: 'Shahganj SDH', status: 'stable', beds: '14 Free', o2: '40h' },
-    'hospital-jaunpur-mariahu':    { lat: 25.5600, lng: 82.5700, shortName: 'Mariahu CHC', status: 'warning', beds: '3 Free', o2: '8.2h' },
-    'hospital-jaunpur-machhlishahr':{ lat: 25.6800, lng: 82.4200, shortName: 'Machhlishahr SDH', status: 'stable', beds: '11 Free', o2: '34h' },
-    'hospital-jaunpur-baksha':     { lat: 25.8200, lng: 82.5500, shortName: 'Baksha PHC', status: 'critical', beds: '1 Free', o2: '4.8h' },
-    'hospital-jaunpur-kerakat':    { lat: 25.6300, lng: 82.9200, shortName: 'Kerakat CHC', status: 'warning', beds: '4 Free', o2: '18h' },
-    'hospital-dch-central':        { lat: 26.7606, lng: 83.3732, shortName: 'Gorakhpur Civil Apex', status: 'critical', beds: '4 Free', o2: '4.2h' },
-    'hospital-sdh-bansgaon':       { lat: 26.5100, lng: 83.3500, shortName: 'Bansgaon SDH', status: 'stable', beds: '18 Free', o2: '38.5h' },
-    'hospital-chc-sahjanwa':       { lat: 26.7400, lng: 83.1800, shortName: 'Sahjanwa CHC', status: 'warning', beds: '4 Free', o2: '9.8h' },
-    'hospital-phc-kusumhi':        { lat: 26.7400, lng: 83.4900, shortName: 'Kusumhi PHC', status: 'critical', beds: '1 Free', o2: '3.5h' }
-  };
+  const App = window.SevaRoute;
 
   let leafletMapInstance = null;
   const leafletMarkers = {};
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
 
   function initMapInteractivity() {
     setupCardToMapHover();
     setupMapToCardHover();
     setupTickerInteractivity();
     initLeafletGisMap();
+    renderAccessibleFacilityList();
+  }
+
+  function renderAccessibleFacilityList() {
+    const list = document.getElementById('map-facility-list');
+    const facilities = App?.state?.facilities || [];
+    if (!list || !facilities.length) return;
+
+    const heading = document.createElement('h4');
+    heading.className = 'map-facility-list-title';
+    heading.textContent = 'Facility availability';
+    list.replaceChildren(heading);
+
+    const items = document.createElement('div');
+    items.className = 'map-facility-list-items';
+    facilities.forEach(facility => {
+      const link = document.createElement('a');
+      link.href = `hospitals.html#${facility.id}`;
+      link.className = `map-facility-item ${facility.status}`;
+      link.textContent = `${facility.shortName} - ${facility.icuFree} ICU free - ${facility.o2Hrs}h O2`;
+      items.appendChild(link);
+    });
+    list.appendChild(items);
   }
 
   function initLeafletGisMap() {
@@ -38,31 +57,44 @@
       leafletMapInstance.remove();
     }
 
+    const facilities = App?.state?.facilities || [];
+    if (!facilities.length) return;
+
+    mapContainer.setAttribute('aria-busy', 'true');
+    setMapStatus(mapContainer, 'Loading map tiles...', 'loading');
+
     // Centered on Jaunpur/Gorakhpur Sector with optimal zoom to prevent pin overlap
     leafletMapInstance = L.map(mapContainer, {
       center: [26.15, 82.95],
       zoom: 9,
       zoomControl: true,
-      attributionControl: false
+      attributionControl: true
     });
 
-    // High-Contrast Dark CartoDB Tiles
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Public demo basemap; production should use an approved tile provider.
+    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 18,
-      subdomains: 'abcd'
+      attribution: '&copy; OpenStreetMap contributors'
     }).addTo(leafletMapInstance);
+    tileLayer.on('load', () => {
+      mapContainer.setAttribute('aria-busy', 'false');
+      setMapStatus(mapContainer, '', 'ready');
+    });
+    tileLayer.on('tileerror', () => {
+      mapContainer.setAttribute('aria-busy', 'false');
+      setMapStatus(mapContainer, 'Map tiles unavailable. Facility list remains available below.', 'error');
+    });
 
     // Plot Sleek Non-Overlapping Custom Pin Markers
-    Object.keys(FACILITY_COORDS).forEach(id => {
-      const f = FACILITY_COORDS[id];
+    facilities.forEach(f => {
 
       const pinIcon = L.divIcon({
         className: 'leaflet-custom-marker',
         html: `
-          <div class="gis-pin-wrapper ${f.status}" id="map-pin-${id}">
+          <div class="gis-pin-wrapper ${f.status}" id="map-pin-${f.id}">
             <span class="gis-pin-dot ${f.status}"></span>
-            <span class="gis-pin-label">${f.shortName}</span>
-            <span class="gis-pin-metric ${f.status}">${f.beds}</span>
+            <span class="gis-pin-label">${escapeHtml(f.shortName)}</span>
+            <span class="gis-pin-metric ${f.status}">${f.icuFree} Free</span>
           </div>
         `,
         iconSize: [120, 24],
@@ -73,17 +105,17 @@
       
       marker.bindPopup(`
         <div style="font-family:sans-serif; color:#0f172a; padding:6px; min-width:160px;">
-          <strong style="font-size:0.88rem; display:block; margin-bottom:4px; color:#0f172a;">${f.shortName}</strong>
+            <strong style="font-size:0.88rem; display:block; margin-bottom:4px; color:#0f172a;">${escapeHtml(f.shortName)}</strong>
           <div style="font-size:0.76rem; color:#475569; margin-bottom:6px;">
-            <span>ICU Free: <strong style="color:#047857;">${f.beds}</strong></span><br>
-            <span>Oxygen Reserve: <strong style="color:#0284c7;">${f.o2}</strong></span>
+            <span>ICU Free: <strong style="color:#047857;">${f.icuFree} / ${f.icuTotal}</strong></span><br>
+            <span>Oxygen Reserve: <strong style="color:#0284c7;">${f.o2Hrs}h</strong></span>
           </div>
-          <a href="#${id}" onclick="document.getElementById('${id}')?.scrollIntoView({behavior:'smooth', block:'center'});" style="font-size:0.75rem; color:#2563eb; font-weight:700; text-decoration:none;">View Facility Card &rarr;</a>
+          <a href="hospitals.html#${f.id}" style="font-size:0.75rem; color:#2563eb; font-weight:700; text-decoration:none;">View Facility Card &rarr;</a>
         </div>
       `);
 
       marker.on('click', () => {
-        const card = document.getElementById(id);
+        const card = document.getElementById(f.id);
         if (card) {
           card.scrollIntoView({ behavior: 'smooth', block: 'center' });
           card.classList.add('card-hover-highlight');
@@ -91,7 +123,7 @@
         }
       });
 
-      leafletMarkers[id] = marker;
+      leafletMarkers[f.id] = marker;
 
       // Add Glowing Danger Circle for Critical Surge Hospitals
       if (f.status === 'critical') {
@@ -119,19 +151,24 @@
 
     // Highway Routes
     const nh31Corridor = [
-      [FACILITY_COORDS['hospital-jaunpur-machhlishahr'].lat, FACILITY_COORDS['hospital-jaunpur-machhlishahr'].lng],
-      [FACILITY_COORDS['hospital-jaunpur-baksha'].lat, FACILITY_COORDS['hospital-jaunpur-baksha'].lng],
-      [FACILITY_COORDS['hospital-jaunpur-civil'].lat, FACILITY_COORDS['hospital-jaunpur-civil'].lng],
-      [FACILITY_COORDS['hospital-jaunpur-shahganj'].lat, FACILITY_COORDS['hospital-jaunpur-shahganj'].lng]
+      getFacilityPoint(facilities, 'hospital-jaunpur-machhlishahr'),
+      getFacilityPoint(facilities, 'hospital-jaunpur-baksha'),
+      getFacilityPoint(facilities, 'hospital-jaunpur-civil'),
+      getFacilityPoint(facilities, 'hospital-jaunpur-shahganj')
     ];
     L.polyline(nh31Corridor, { color: '#ff9933', weight: 3, opacity: 0.85, dashArray: '6, 6' }).addTo(leafletMapInstance);
 
     const nh28Corridor = [
-      [FACILITY_COORDS['hospital-jaunpur-civil'].lat, FACILITY_COORDS['hospital-jaunpur-civil'].lng],
-      [FACILITY_COORDS['hospital-sdh-bansgaon'].lat, FACILITY_COORDS['hospital-sdh-bansgaon'].lng],
-      [FACILITY_COORDS['hospital-dch-central'].lat, FACILITY_COORDS['hospital-dch-central'].lng]
+      getFacilityPoint(facilities, 'hospital-jaunpur-civil'),
+      getFacilityPoint(facilities, 'hospital-sdh-bansgaon'),
+      getFacilityPoint(facilities, 'hospital-dch-central')
     ];
     L.polyline(nh28Corridor, { color: '#06b6d4', weight: 3, opacity: 0.85 }).addTo(leafletMapInstance);
+  }
+
+  function getFacilityPoint(facilities, facilityId) {
+    const facility = facilities.find(item => item.id === facilityId);
+    return facility ? [facility.lat, facility.lng] : null;
   }
 
   function setupCardToMapHover() {
@@ -224,6 +261,32 @@
         const targetCard = document.getElementById('hospital-dch-central');
         if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+    });
+
+    updateMarkerDensity();
+    leafletMapInstance.on('zoomend', updateMarkerDensity);
+  }
+
+  function setMapStatus(mapContainer, message, state) {
+    let status = mapContainer.querySelector('.map-status-message');
+    if (!message) {
+      status?.remove();
+      return;
+    }
+    if (!status) {
+      status = document.createElement('div');
+      status.className = 'map-status-message';
+      mapContainer.appendChild(status);
+    }
+    status.className = `map-status-message ${state}`;
+    status.textContent = message;
+  }
+
+  function updateMarkerDensity() {
+    if (!leafletMapInstance) return;
+    const compact = leafletMapInstance.getZoom() < 10;
+    document.querySelectorAll('.gis-pin-wrapper').forEach(pin => {
+      pin.classList.toggle('compact', compact);
     });
   }
 

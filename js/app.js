@@ -8,6 +8,26 @@ window.SevaRoute = window.SevaRoute || {};
 (function () {
   'use strict';
 
+  function readStoredJson(key, fallback) {
+    try {
+      const storedValue = localStorage.getItem(key);
+      return storedValue ? JSON.parse(storedValue) : fallback;
+    } catch (error) {
+      console.warn(`Unable to read stored value for ${key}:`, error);
+      return fallback;
+    }
+  }
+
+  function writeStoredJson(key, value) {
+    try {
+      localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+      return true;
+    } catch (error) {
+      console.warn(`Unable to store value for ${key}:`, error);
+      return false;
+    }
+  }
+
   // State Store
   const state = {
     lang: localStorage.getItem('sevaroute_lang') || 'en', // 'en' | 'hi'
@@ -17,21 +37,8 @@ window.SevaRoute = window.SevaRoute || {};
     filterStatus: 'all',   // 'all' | 'critical' | 'warning' | 'stable'
     filterAsset: 'all',    // 'all' | 'icu_gt_5' | 'o2_gt_12' | 'surgeons' | 'antivenom'
     searchQuery: '',
-    dispatchLogs: JSON.parse(localStorage.getItem('sevaroute_dispatches') || '[]'),
-    facilities: [
-      { id: 'hospital-jaunpur-civil', district: 'jaunpur', status: 'critical', nameEn: 'Pt. Deendayal Upadhyay District Hospital (Jaunpur Civil)', nameHi: 'पं. दीनदयाल उपाध्याय जिला अस्पताल (जौनपुर सिविल)', icuFree: 3, icuTotal: 48, o2Hrs: 5.1, o2Pct: 22, surgeons: 5, bloodUnits: 2, antivenom: 5, etaMin: 6 },
-      { id: 'hospital-jaunpur-shahganj', district: 'jaunpur', status: 'stable', nameEn: 'Sub-District Hospital (Shahganj Division, Jaunpur)', nameHi: 'उप-जिला अस्पताल (शाहगंज प्रभाग, जौनपुर)', icuFree: 14, icuTotal: 28, o2Hrs: 40.0, o2Pct: 88, surgeons: 5, bloodUnits: 9, antivenom: 12, etaMin: 19 },
-      { id: 'hospital-jaunpur-mariahu', district: 'jaunpur', status: 'warning', nameEn: 'Community Health Center (Mariahu CHC - FRU)', nameHi: 'सामुदायिक स्वास्थ्य केंद्र (मडियाहूँ सीएचसी)', icuFree: 3, icuTotal: 16, o2Hrs: 8.2, o2Pct: 28, surgeons: 2, bloodUnits: 1, antivenom: 4, etaMin: 24 },
-      { id: 'hospital-jaunpur-machhlishahr', district: 'jaunpur', status: 'stable', nameEn: 'Machhlishahr Sub-Divisional Hospital (Jaunpur)', nameHi: 'मछलीशहर उप-विभागीय अस्पताल (जौनपुर)', icuFree: 11, icuTotal: 20, o2Hrs: 34.0, o2Pct: 80, surgeons: 4, bloodUnits: 5, antivenom: 10, etaMin: 26 },
-      { id: 'hospital-jaunpur-baksha', district: 'jaunpur', status: 'critical', nameEn: 'Gram Health & Wellness Center (Baksha PHC, Gomti Basin)', nameHi: 'ग्राम स्वास्थ्य एवं कल्याण केंद्र (बक्शा प्राथमिक स्वास्थ्य केंद्र)', icuFree: 1, icuTotal: 8, o2Hrs: 4.8, o2Pct: 20, surgeons: 1, bloodUnits: 0, antivenom: 1, etaMin: 31 },
-      { id: 'hospital-jaunpur-kerakat', district: 'jaunpur', status: 'warning', nameEn: 'Community Health Center (Kerakat CHC, Jaunpur)', nameHi: 'सामुदायिक स्वास्थ्य केंद्र (केराकत सीएचसी, जौनपुर)', icuFree: 4, icuTotal: 16, o2Hrs: 18.0, o2Pct: 60, surgeons: 3, bloodUnits: 2, antivenom: 6, etaMin: 21 },
-      { id: 'hospital-dch-central', district: 'gkp', status: 'critical', nameEn: 'District Civil Hospital (Gorakhpur Central)', nameHi: 'जिला सिविल अस्पताल (गोरखपुर सेंट्रल)', icuFree: 4, icuTotal: 64, o2Hrs: 4.2, o2Pct: 18, surgeons: 4, bloodUnits: 1, antivenom: 8, etaMin: 8 },
-      { id: 'hospital-sdh-bansgaon', district: 'gkp', status: 'stable', nameEn: 'Sub-District Civil Hospital (Bansgaon Division)', nameHi: 'उप-जिला सिविल अस्पताल (बांसगांव प्रभाग)', icuFree: 18, icuTotal: 32, o2Hrs: 38.5, o2Pct: 85, surgeons: 6, bloodUnits: 8, antivenom: 15, etaMin: 22 },
-      { id: 'hospital-chc-sahjanwa', district: 'gkp', status: 'warning', nameEn: 'Community Health Center (Sahjanwa CHC)', nameHi: 'सामुदायिक स्वास्थ्य केंद्र (सहजनवा सीएचसी)', icuFree: 4, icuTotal: 16, o2Hrs: 9.8, o2Pct: 32, surgeons: 2, bloodUnits: 0, antivenom: 3, etaMin: 17 },
-      { id: 'hospital-phc-kusumhi', district: 'gkp', status: 'critical', nameEn: 'Tribal Health & Wellness Center (Kusumhi Gram PHC)', nameHi: 'जनजातीय स्वास्थ्य केंद्र (कुसुम्ही ग्राम पीएचसी)', icuFree: 1, icuTotal: 8, o2Hrs: 5.5, o2Pct: 22, surgeons: 1, bloodUnits: 0, antivenom: 2, etaMin: 34 },
-      { id: 'hospital-sdh-pipraich', district: 'gkp', status: 'stable', nameEn: 'Taluka Civil Hospital (Pipraich Sub-Center)', nameHi: 'तालुका सिविल अस्पताल (पिपराइच उप-केंद्र)', icuFree: 12, icuTotal: 20, o2Hrs: 42.0, o2Pct: 92, surgeons: 4, bloodUnits: 6, antivenom: 14, etaMin: 28 },
-      { id: 'hospital-mobile-04', district: 'gkp', status: 'warning', nameEn: 'Mobile Emergency Container Unit #04 (Riverine Belt)', nameHi: 'मोबाइल इमरजेंसी कंटेनर यूनिट #04 (राप्ती नदी क्षेत्र)', icuFree: 3, icuTotal: 6, o2Hrs: 16.0, o2Pct: 96, surgeons: 1, bloodUnits: 2, antivenom: 5, etaMin: 12 }
-    ]
+    dispatchLogs: readStoredJson('sevaroute_dispatches', []),
+    facilities: (window.SevaRouteFacilityRegistry || []).map(facility => ({ ...facility }))
   };
 
   // i18n Translations Dictionary (Official MoHFW / NHM UP Hindi Terminology)
@@ -161,16 +168,31 @@ window.SevaRoute = window.SevaRoute || {};
     
     const icon = type === 'success' ? '✓' : type === 'warning' ? '⚠️' : type === 'critical' ? '🚨' : 'ℹ️';
 
-    toast.innerHTML = `
-      <div class="toast-icon">${icon}</div>
-      <div class="toast-content">
-        <div class="toast-title">${title}</div>
-        <div class="toast-msg">${message}</div>
-      </div>
-      <button class="toast-close" aria-label="Close toast">&times;</button>
-    `;
+    const iconEl = document.createElement('div');
+    iconEl.className = 'toast-icon';
+    iconEl.textContent = icon;
 
-    toast.querySelector('.toast-close').onclick = () => {
+    const contentEl = document.createElement('div');
+    contentEl.className = 'toast-content';
+
+    const titleEl = document.createElement('div');
+    titleEl.className = 'toast-title';
+    titleEl.textContent = title;
+
+    const messageEl = document.createElement('div');
+    messageEl.className = 'toast-msg';
+    messageEl.textContent = message;
+
+    const closeButton = document.createElement('button');
+    closeButton.className = 'toast-close';
+    closeButton.type = 'button';
+    closeButton.setAttribute('aria-label', 'Close toast');
+    closeButton.textContent = '×';
+
+    contentEl.append(titleEl, messageEl);
+    toast.append(iconEl, contentEl, closeButton);
+
+    closeButton.onclick = () => {
       toast.classList.add('toast-fade-out');
       setTimeout(() => toast.remove(), 300);
     };
@@ -215,7 +237,7 @@ window.SevaRoute = window.SevaRoute || {};
   // i18n Switcher Implementation (Translates 100% of UI Text)
   function setLanguage(lang) {
     state.lang = lang;
-    localStorage.setItem('sevaroute_lang', lang);
+    writeStoredJson('sevaroute_lang', lang);
     document.documentElement.lang = lang;
     
     const dict = translations[lang] || translations.en;
@@ -241,15 +263,16 @@ window.SevaRoute = window.SevaRoute || {};
           nameEl.textContent = lang === 'hi' ? fac.nameHi : fac.nameEn;
         }
 
-        // Translate Surge Badges
-        const surgeBadge = card.querySelector('.h-card-top span:last-child');
+        // Translate status badges without replacing the status indicator dot.
+        const surgeBadge = card.querySelector('.h-status-badge');
         if (surgeBadge) {
+          const statusDot = surgeBadge.querySelector('.live-pulse-dot');
           if (fac.status === 'critical') {
-            surgeBadge.textContent = lang === 'hi' ? `अति-गंभीर दबाव (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `CRITICAL SURGE (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`;
+            surgeBadge.replaceChildren(statusDot, document.createTextNode(lang === 'hi' ? `अति-गंभीर दबाव (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `CRITICAL SURGE (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`));
           } else if (fac.status === 'stable') {
-            surgeBadge.textContent = lang === 'hi' ? `सुरक्षित स्थिति (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `STABLE (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`;
+            surgeBadge.replaceChildren(statusDot, document.createTextNode(lang === 'hi' ? `सुरक्षित स्थिति (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `STABLE (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`));
           } else {
-            surgeBadge.textContent = lang === 'hi' ? `सचेत स्थिति (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `CAUTION ALERT (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`;
+            surgeBadge.replaceChildren(statusDot, document.createTextNode(lang === 'hi' ? `सचेत स्थिति (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% फुल)` : `CAUTION ALERT (${Math.round((1 - fac.icuFree/fac.icuTotal)*100)}% FULL)`));
           }
         }
       }
@@ -271,16 +294,35 @@ window.SevaRoute = window.SevaRoute || {};
 
     // 4. Translate Navigation Page Links (Strict Scope)
     const navLinks = [
-      { sel: '.main-page-nav a[href="index.html"] span, .main-view-tab-nav #tab-btn-all span', en: 'Executive Overview', hi: 'कार्यकारी अवलोकन' },
-      { sel: '.main-page-nav a[href="hospitals.html"] span, .main-view-tab-nav #tab-btn-hospitals span', en: 'Hospital Grid & Matrix', hi: 'अस्पताल ग्रिड व तालिका' },
-      { sel: '.main-page-nav a[href="map.html"] span, .main-view-tab-nav #tab-btn-map span', en: 'Emergency GIS Map', hi: 'आपातकालीन जीआईएस मानचित्र' },
-      { sel: '.main-page-nav a[href="telemetry.html"] span, .main-view-tab-nav #tab-btn-telemetry span', en: 'Telemetry & Storage', hi: 'टेलीमेट्री व ऑक्सीजन भंडारण' }
+      { href: 'index.html', en: 'Executive Overview', hi: 'कार्यकारी अवलोकन' },
+      { href: 'hospitals.html', en: 'Hospital Grid & Matrix', hi: 'अस्पताल ग्रिड व तालिका' },
+      { href: 'map.html', en: 'Emergency GIS Map', hi: 'आपातकालीन जीआईएस मानचित्र' },
+      { href: 'telemetry.html', en: 'Telemetry & Storage', hi: 'टेलीमेट्री व ऑक्सीजन भंडारण' }
     ];
 
     navLinks.forEach(item => {
-      document.querySelectorAll(item.sel).forEach(span => {
-        span.textContent = lang === 'hi' ? item.hi : item.en;
+      document.querySelectorAll(`.main-page-nav a[href="${item.href}"]`).forEach(link => {
+        const labelNode = [...link.childNodes].find(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+        if (labelNode) labelNode.textContent = ` ${lang === 'hi' ? item.hi : item.en}`;
       });
+    });
+
+    document.querySelectorAll('.contrast-toggle-label').forEach(el => { el.textContent = dict.fieldContrast; });
+    document.querySelectorAll('.sos-call-btn').forEach(el => { el.textContent = dict.emergencySosBtn; });
+
+    const formLabels = {
+      'caller-name': 'patientNameLabel',
+      'triage-level': 'triagePriorityLabel',
+      'pickup-village': 'pickupLocationLabel',
+      'dest-hospital': 'destHospitalLabel',
+      'ambulance-type': 'ambulanceTypeLabel',
+      'abha-id': 'abhaIdLabel',
+      'clinical-notes': 'clinicalNotesLabel'
+    };
+    Object.entries(formLabels).forEach(([fieldId, key]) => {
+      const field = document.getElementById(fieldId);
+      const label = field ? document.querySelector(`label[for="${fieldId}"]`) : null;
+      if (label && dict[key]) label.textContent = dict[key];
     });
 
     // 5. Update Language Toggle Button Visual
@@ -301,12 +343,68 @@ window.SevaRoute = window.SevaRoute || {};
 
   // Accessible Modal Keyboard Trapping & Escape listener
   function setupModalAccessibility() {
+    let lastFocusedElement = null;
+
+    document.querySelectorAll('label[for]').forEach(label => {
+      label.setAttribute('role', 'button');
+      label.tabIndex = 0;
+      label.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        label.click();
+      });
+    });
+
+    const modalIds = ['modal-dispatch', 'modal-telemetry'];
+    modalIds.forEach(id => {
+      const checkbox = document.getElementById(id);
+      const backdropClass = id === 'modal-dispatch' ? '.modal-dispatch-wrap' : '.modal-telemetry-wrap';
+      const backdrop = document.querySelector(backdropClass);
+      if (!checkbox || !backdrop) return;
+
+      backdrop.setAttribute('aria-hidden', checkbox.checked ? 'false' : 'true');
+      checkbox.addEventListener('change', () => {
+        const isOpen = checkbox.checked;
+        backdrop.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+
+        if (isOpen) {
+          lastFocusedElement = document.activeElement;
+          requestAnimationFrame(() => backdrop.querySelector('.modal-close-btn, input, select, textarea, button')?.focus());
+        } else if (lastFocusedElement instanceof HTMLElement) {
+          lastFocusedElement.focus();
+        }
+      });
+
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) checkbox.click();
+      });
+    });
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const modalDispatch = document.getElementById('modal-dispatch');
         const modalTelemetry = document.getElementById('modal-telemetry');
-        if (modalDispatch && modalDispatch.checked) modalDispatch.checked = false;
-        if (modalTelemetry && modalTelemetry.checked) modalTelemetry.checked = false;
+        if (modalDispatch?.checked) modalDispatch.click();
+        if (modalTelemetry?.checked) modalTelemetry.click();
+      }
+
+      if (e.key === 'Tab') {
+        const activeModal = document.querySelector('.modal-backdrop[aria-hidden="false"]');
+        if (!activeModal) return;
+
+        const focusable = [...activeModal.querySelectorAll('button, input, select, textarea, [tabindex]:not([tabindex="-1"])')]
+          .filter(element => !element.disabled && element.offsetParent !== null);
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     });
   }
@@ -314,7 +412,7 @@ window.SevaRoute = window.SevaRoute || {};
   // Main View Tab Switcher
   function setMainTab(tabName) {
     state.mainTab = tabName;
-    localStorage.setItem('sevaroute_maintab', tabName);
+    writeStoredJson('sevaroute_maintab', tabName);
     document.body.setAttribute('data-main-tab', tabName);
 
     document.querySelectorAll('.main-tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -339,10 +437,10 @@ window.SevaRoute = window.SevaRoute || {};
       contrastToggle.addEventListener('change', (e) => {
         if (e.target.checked) {
           document.documentElement.classList.add('light-theme-active');
-          localStorage.setItem('sevaroute_theme', 'light');
+          writeStoredJson('sevaroute_theme', 'light');
         } else {
           document.documentElement.classList.remove('light-theme-active');
-          localStorage.setItem('sevaroute_theme', 'dark');
+          writeStoredJson('sevaroute_theme', 'dark');
         }
       });
     }
@@ -392,6 +490,7 @@ window.SevaRoute = window.SevaRoute || {};
 
   // Export module to global scope
   window.SevaRoute.state = state;
+  window.SevaRoute.writeStoredJson = writeStoredJson;
   window.SevaRoute.showToast = showToast;
   window.SevaRoute.playEmergencyChime = playEmergencyChime;
   window.SevaRoute.setLanguage = setLanguage;
@@ -403,6 +502,7 @@ window.SevaRoute = window.SevaRoute || {};
     initThemePersistence();
     initLiveClock();
     setupEmergencyHotkeys();
+    document.getElementById('btn-lang-toggle')?.addEventListener('click', toggleLanguage);
     setLanguage(state.lang);
     setupModalAccessibility();
     const savedTab = localStorage.getItem('sevaroute_maintab') || 'all';

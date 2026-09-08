@@ -3,20 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; script-src 'self' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org; connect-src 'self' https://*.basemaps.cartocdn.com https://*.tile.openstreetmap.org;">
   <meta name="description" content="SevaRoute - Hospital Infrastructure Grid & Control Room Matrix for Gorakhpur and Jaunpur UP.">
   <title>SevaRoute - Hospital Infrastructure &amp; Matrix | 12 Monitored Facilities</title>
-  <script>
-    (function() {
-      if (localStorage.getItem('sevaroute_theme') === 'light') {
-        document.documentElement.classList.add('light-theme-active');
-      }
-    })();
-  </script>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-  <!-- Radios at Body Root -->
+  <script src="js/theme-init.js?v=20260908"></script>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="style.css?v=20260908-11">
   <input type="radio" name="district-corridor-filter" id="corridor-all" class="corridor-radio" checked>
   <input type="radio" name="district-corridor-filter" id="corridor-gkp" class="corridor-radio">
   <input type="radio" name="district-corridor-filter" id="corridor-jaunpur" class="corridor-radio">
@@ -45,7 +37,7 @@
         </div>
         <label for="modal-dispatch" class="modal-close-btn">&times;</label>
       </div>
-      <form class="modal-form" onsubmit="return false;">
+      <form class="modal-form">
         <div class="form-group-grid">
           <div class="form-field"><label>Patient Name</label><input type="text" id="caller-name" class="form-input" placeholder="e.g. Rameshwar Bind"></div>
           <div class="form-field"><label>Priority</label><select id="triage-level" class="form-select"><option value="p1">P1 - Immediate Threat</option><option value="p2">P2 - Urgent</option></select></div>
@@ -102,7 +94,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <button type="button" id="btn-lang-toggle" onclick="window.SevaRoute.toggleLanguage()" class="lang-toggle-btn">
+        <button type="button" id="btn-lang-toggle" class="lang-toggle-btn">
           <svg class="nav-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> English
         </button>
         <label for="toggle-emergency-contrast" class="contrast-toggle-label">Field Contrast</label>
@@ -256,11 +248,13 @@
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/telemetrySim.js"></script>
-  <script src="js/dispatchEngine.js"></script>
-  <script src="js/searchFilter.js"></script>
-  <script src="js/mapInteractivity.js"></script>
-  <script src="js/exportEngine.js"></script>
+  <script src="js/facilityRegistry.js?v=20260908-2"></script>
+  <script src="js/app.js?v=20260908-5"></script>
+  <script src="js/telemetryAdapter.js?v=20260908"></script>
+  <script src="js/telemetrySim.js?v=20260908-6"></script>
+  <script src="js/dispatchEngine.js?v=20260908-6"></script>
+  <script src="js/searchFilter.js?v=20260908-6"></script>
+  <script src="js/mapInteractivity.js?v=20260908-5"></script>
+  <script src="js/exportEngine.js?v=20260908"></script>
 </body>
 </html>

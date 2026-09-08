@@ -7,17 +7,30 @@
   'use strict';
 
   const App = window.SevaRoute;
+  const Telemetry = window.SevaRouteTelemetry;
 
   // Initialize Telemetry Simulator
   function initSimulator() {
-    // Every 8 seconds, simulate minor pressure / ICU bed telemetry update
-    setInterval(updateRandomFacilityTelemetry, 8000);
-
     // Every 12 seconds, append a new IoT log entry to Telemetry Modal
     setInterval(generateNewTelemetryLog, 12000);
+    setInterval(updateTelemetrySourceStatus, 5000);
 
     // Wire Diagnostic Severity Filters inside Telemetry Modal
     setupDiagnosticFilters();
+    Telemetry?.ingest();
+    updateTelemetrySourceStatus();
+    updateKPIVitals();
+  }
+
+  function updateTelemetrySourceStatus() {
+    const statusEl = document.querySelector('.telemetry-source-status');
+    if (!statusEl || !Telemetry) return;
+
+    const status = Telemetry.getStatus();
+    statusEl.classList.toggle('is-stale', status.stale);
+    statusEl.textContent = status.stale
+      ? `TELEMETRY STALE • ${status.source.toUpperCase()} • Last sync unavailable`
+      : `TELEMETRY ${status.source.toUpperCase()} • ${status.lastSync ? 'SYNCED' : 'CONNECTING'}`;
   }
 
   function updateRandomFacilityTelemetry() {
@@ -25,6 +38,7 @@
     const facilities = App.state.facilities;
     const randomIndex = Math.floor(Math.random() * facilities.length);
     const target = facilities[randomIndex];
+    Telemetry?.ingest();
 
     // Minor fluctuation: +/- 1 ICU bed within limits
     const deltaBed = Math.random() > 0.6 ? (Math.random() > 0.5 ? 1 : -1) : 0;
@@ -35,7 +49,14 @@
       const card = document.getElementById(target.id);
       if (card) {
         const valEl = card.querySelector('.h-metric-val');
-        if (valEl && valEl.classList.contains('text-critical') || valEl.classList.contains('text-stable') || valEl.classList.contains('text-warning')) {
+        if (
+          valEl &&
+          (
+            valEl.classList.contains('text-critical') ||
+            valEl.classList.contains('text-stable') ||
+            valEl.classList.contains('text-warning')
+          )
+        ) {
           valEl.textContent = target.icuFree;
         }
 
@@ -51,16 +72,26 @@
 
   function updateKPIVitals() {
     if (!App || !App.state) return;
-    const totalFreeBeds = App.state.facilities.reduce((sum, f) => sum + f.icuFree, 0);
+    const totalFreeBeds = App.state.facilities.reduce((sum, facility) => sum + facility.icuFree, 0);
+    const totalIcuBeds = App.state.facilities.reduce((sum, facility) => sum + facility.icuTotal, 0);
     const kpiNumber = document.querySelector('.vital-card.status-critical-theme .vital-number');
+    const kpiUnit = document.querySelector('.vital-card.status-critical-theme .vital-unit');
+    const kpiBar = document.querySelector('.vital-card.status-critical-theme .vital-bar-fill');
     if (kpiNumber) {
       kpiNumber.textContent = totalFreeBeds;
+    }
+    if (kpiUnit) {
+      kpiUnit.textContent = `/ ${totalIcuBeds} Free Beds`;
+    }
+    if (kpiBar && totalIcuBeds > 0) {
+      kpiBar.style.width = `${((totalIcuBeds - totalFreeBeds) / totalIcuBeds) * 100}%`;
     }
   }
 
   function generateNewTelemetryLog() {
     const list = document.querySelector('.telemetry-log-list');
     if (!list) return;
+    Telemetry?.ingest();
 
     const sampleLogs = [
       { status: 'ok', title: '[OK] NavIC SATELLITE TELEMETRY BEACON #08', detail: 'Grid lock verified • Latency: 29ms • Signal: -62 dBm • 108 GPS corridor open' },
@@ -73,10 +104,13 @@
     const entry = document.createElement('div');
     entry.className = `telemetry-log-entry status-${randomLog.status}`;
     entry.setAttribute('data-severity', randomLog.status);
-    entry.innerHTML = `
-      <div class="tlog-status">${randomLog.title}</div>
-      <div class="tlog-detail">${randomLog.detail}</div>
-    `;
+    const title = document.createElement('div');
+    title.className = 'tlog-status';
+    title.textContent = randomLog.title;
+    const detail = document.createElement('div');
+    detail.className = 'tlog-detail';
+    detail.textContent = randomLog.detail;
+    entry.append(title, detail);
 
     list.insertBefore(entry, list.firstChild);
 

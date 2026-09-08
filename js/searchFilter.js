@@ -9,11 +9,110 @@
   const App = window.SevaRoute;
 
   function initSearchAndFilters() {
+    renderFacilityCards();
     setupSearchInput();
     setupAssetFilter();
     setupViewSwitcher();
     setupCorridorRadioListeners();
     setupHealthRadioListeners();
+  }
+
+  function createElement(tagName, className, text) {
+    const element = document.createElement(tagName);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = text;
+    return element;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+
+  function renderFacilityCards() {
+    const container = document.querySelector('.hospitals-matrix-list');
+    if (!container || !App?.state?.facilities) return;
+
+    container.replaceChildren();
+
+    App.state.facilities.forEach(facility => {
+      const article = createElement('article', `hospital-card card-status-${facility.status} district-${facility.district}`);
+      article.id = facility.id;
+
+      const top = createElement('div', 'h-card-top');
+      const identity = createElement('div', 'h-identity');
+      const tags = createElement('div', 'h-tier-tags');
+      tags.append(
+        createElement('span', `h-district-pill ${facility.district}`, facility.district === 'gkp' ? 'Gorakhpur' : 'Jaunpur'),
+        createElement('span', 'h-type-badge', facility.typeEn)
+      );
+      identity.append(
+        tags,
+        createElement('h3', 'h-name', facility.nameEn),
+        createElement('div', 'h-location', `${facility.location} - ${facility.beds} Beds`)
+      );
+
+      const occupancy = Math.round((1 - facility.icuFree / facility.icuTotal) * 100);
+      const statusText = facility.status === 'critical'
+        ? `CRITICAL SURGE (${occupancy}% FULL)`
+        : facility.status === 'warning'
+          ? `CAUTION ALERT (${occupancy}% FULL)`
+          : `STABLE (${occupancy}% FULL)`;
+      const status = createElement('div', `h-status-badge ${facility.status}`);
+      status.append(createElement('span', `live-pulse-dot ${facility.status}`), document.createTextNode(statusText));
+      top.append(identity, status);
+
+      const metrics = createElement('div', 'h-metrics-row');
+      metrics.append(
+        createMetric('ICU Free', `${facility.icuFree} Free / ${facility.icuTotal}`, facility.icuFree, facility.icuFree < 5 ? 'critical' : 'stable'),
+        createMetric('O2 Reserve', `${facility.o2Hrs} Hours`, `${facility.o2Hrs}h`, facility.o2Hrs < 8 ? 'critical' : 'stable'),
+        createMetric('Surgeons', `${facility.surgeons} Active`, facility.surgeons, facility.surgeons < 3 ? 'warning' : 'stable'),
+        createMetric('Antivenom', `${facility.antivenom} Vials`, facility.antivenom, facility.antivenom < 5 ? 'warning' : 'stable')
+      );
+
+      const footer = createElement('div', 'h-infra-footer');
+      const badges = createElement('div', 'infra-badges');
+      badges.append(
+        createElement('span', `infra-badge ${facility.status === 'critical' ? 'alert' : facility.status === 'warning' ? 'caution' : 'passable'}`,
+          facility.status === 'critical' ? 'Capacity alert' : facility.status === 'warning' ? 'Monitoring required' : 'Beds ready'),
+        createElement('span', 'infra-badge passable', `${facility.o2Hrs}h O2 reserve`)
+      );
+      const actions = createElement('div', 'card-actions-group');
+      const dispatchLabel = createElement('label', `action-btn-sm ${facility.status === 'critical' ? 'divert-btn' : 'route-btn'}`, '108 Route');
+      dispatchLabel.htmlFor = 'modal-dispatch';
+      actions.append(dispatchLabel);
+      footer.append(badges, actions);
+
+      article.append(top, metrics, footer);
+      container.appendChild(article);
+    });
+
+    ensureCardEmptyState(container, App.state.facilities.length);
+
+    if (App.setLanguage) App.setLanguage(App.state.lang);
+  }
+
+  function ensureCardEmptyState(container, visibleCount) {
+    let emptyState = container.querySelector('.facility-empty-state');
+    if (!emptyState) {
+      emptyState = createElement('div', 'facility-empty-state');
+      emptyState.setAttribute('role', 'status');
+      container.appendChild(emptyState);
+    }
+    emptyState.hidden = visibleCount > 0;
+    emptyState.textContent = 'No facilities match the active filters.';
+  }
+
+  function createMetric(label, detail, value, tone) {
+    const metric = createElement('div', 'h-metric-block');
+    const metricLabel = createElement('div', 'h-metric-label');
+    metricLabel.append(createElement('span', '', label), createElement('span', `text-${tone}`, detail));
+    metric.append(metricLabel, createElement('div', `h-metric-val text-${tone}`, value));
+    return metric;
   }
 
   function setupSearchInput() {
@@ -56,7 +155,11 @@
 
     function setViewMode(mode) {
       App.state.viewMode = mode;
-      localStorage.setItem('sevaroute_view', mode);
+      try {
+        localStorage.setItem('sevaroute_view', mode);
+      } catch (error) {
+        console.warn('Unable to store preferred view mode:', error);
+      }
 
       if (mode === 'matrix') {
         btnMatrix.classList.add('active');
@@ -138,6 +241,8 @@
     if (counterEl) {
       counterEl.textContent = `${visibleCount} Monitored Facilities`;
     }
+    const cardsContainer = document.querySelector('.hospitals-matrix-list');
+    if (cardsContainer) ensureCardEmptyState(cardsContainer, visibleCount);
 
     // Re-render compact matrix table if in matrix mode
     if (App.state.viewMode === 'matrix') {
@@ -196,7 +301,7 @@
       filtered.forEach(f => {
         const statusBadge = f.status === 'critical' ? '<span class="vital-status-pill critical">CRITICAL</span>' : f.status === 'warning' ? '<span class="vital-status-pill warning">WARNING</span>' : '<span class="vital-status-pill stable">STABLE</span>';
         const distLabel = f.district === 'jaunpur' ? 'Jaunpur' : 'Gorakhpur';
-        const displayName = App.state.lang === 'hi' ? f.nameHi : f.nameEn;
+        const displayName = escapeHtml(App.state.lang === 'hi' ? f.nameHi : f.nameEn);
 
         html += `
           <tr id="matrix-row-${f.id}" class="matrix-row" data-facility-id="${f.id}">

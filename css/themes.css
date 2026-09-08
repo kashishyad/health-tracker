@@ -386,11 +386,48 @@ html.light-theme-active .brand-hindi,
   color: #64748b !important;
 }
 
+/* Header action buttons — light-mode friendly */
+html.light-theme-active .lang-toggle-btn,
+html.light-theme-active .contrast-toggle-label,
+html.light-theme-active .modal-trigger-btn,
+#toggle-emergency-contrast:checked ~ .app-container .lang-toggle-btn,
+#toggle-emergency-contrast:checked ~ .app-container .contrast-toggle-label,
+#toggle-emergency-contrast:checked ~ .app-container .modal-trigger-btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+html.light-theme-active .sos-call-btn,
+#toggle-emergency-contrast:checked ~ .app-container .sos-call-btn {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%) !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
+html.light-theme-active .lang-toggle-btn:hover,
+html.light-theme-active .contrast-toggle-label:hover,
+html.light-theme-active .modal-trigger-btn:hover,
+#toggle-emergency-contrast:checked ~ .app-container .lang-toggle-btn:hover,
+#toggle-emergency-contrast:checked ~ .app-container .contrast-toggle-label:hover,
+#toggle-emergency-contrast:checked ~ .app-container .modal-trigger-btn:hover {
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+}
+
 /* 3. Section Icons & Header SVGs */
 html.light-theme-active .section-icon,
-#toggle-emergency-contrast:checked ~ .app-container .section-icon {
+#toggle-emergency-contrast:checked ~ .app-container .section-icon,
+#toggle-emergency-contrast:checked ~ .modal-backdrop .section-icon {
   background: #f1f5f9 !important;
   border: 1px solid #cbd5e1 !important;
+}
+
+html.light-theme-active .section-icon svg,
+#toggle-emergency-contrast:checked ~ .app-container .section-icon svg,
+#toggle-emergency-contrast:checked ~ .modal-backdrop .section-icon svg {
+  stroke: currentColor !important;
 }
 
 html.light-theme-active .section-title,
@@ -671,27 +708,7 @@ html.light-theme-active .vital-bar-track,
   background: #e2e8f0 !important;
 }
 
-html.light-theme-active .section-icon,
-#toggle-emergency-contrast:checked ~ .app-container .section-icon,
-#toggle-emergency-contrast:checked ~ .modal-backdrop .section-icon {
-  background: #f1f5f9 !important;
-  border: 1px solid #cbd5e1 !important;
-  color: #0284c7 !important;
-}
-
-html.light-theme-active .section-icon svg,
-#toggle-emergency-contrast:checked ~ .app-container .section-icon svg,
-#toggle-emergency-contrast:checked ~ .modal-backdrop .section-icon svg {
-  stroke: currentColor !important;
-}
-
-html.light-theme-active .print-pdf-btn,
-#toggle-emergency-contrast:checked ~ .app-container .print-pdf-btn,
-#toggle-emergency-contrast:checked ~ .modal-backdrop .print-pdf-btn {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
-  border-color: #cbd5e1 !important;
-}
+/* section-icon preserves its inline color (saffron/cyan/critical) in light mode */
 
 html.light-theme-active .matrix-table-wrapper,
 #toggle-emergency-contrast:checked ~ .app-container .matrix-table-wrapper {
@@ -717,12 +734,17 @@ html.light-theme-active .matrix-table tr:hover,
   background: #f8fafc !important;
 }
 
-html.light-theme-active .toast-notification,
-#toggle-emergency-contrast:checked ~ .app-container .toast-notification {
+html.light-theme-active .toast-card,
+#toggle-emergency-contrast:checked ~ .app-container .toast-card {
   background: #ffffff !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important;
+}
+
+html.light-theme-active .toast-close,
+#toggle-emergency-contrast:checked ~ .app-container .toast-close {
+  color: #64748b !important;
 }
 
 html.light-theme-active .toast-title,
@@ -730,9 +752,288 @@ html.light-theme-active .toast-title,
   color: #0f172a !important;
 }
 
+html.light-theme-active .toast-msg,
 html.light-theme-active .toast-desc,
+#toggle-emergency-contrast:checked ~ .app-container .toast-msg,
 #toggle-emergency-contrast:checked ~ .app-container .toast-desc {
   color: #475569 !important;
+}
+
+/* 11. Hospital Page — Filter Buttons, Status Badges, Metrics & Action Buttons */
+html.light-theme-active .filter-btn,
+#toggle-emergency-contrast:checked ~ .app-container .filter-btn {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+html.light-theme-active .filter-btn:hover,
+#toggle-emergency-contrast:checked ~ .app-container .filter-btn:hover {
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+}
+
+html.light-theme-active .filter-btn.critical-btn,
+#toggle-emergency-contrast:checked ~ .app-container .filter-btn.critical-btn {
+  color: #b91c1c !important;
+}
+
+html.light-theme-active .filter-btn.warning-btn,
+#toggle-emergency-contrast:checked ~ .app-container .filter-btn.warning-btn {
+  color: #b45309 !important;
+}
+
+html.light-theme-active .filter-btn.stable-btn,
+#toggle-emergency-contrast:checked ~ .app-container .filter-btn.stable-btn {
+  color: #047857 !important;
+}
+
+/* Active filter state stays cyan with dark text */
+#filter-all:checked ~ .app-container .filter-btn[for="filter-all"],
+#filter-critical:checked ~ .app-container .filter-btn[for="filter-critical"],
+#filter-warning:checked ~ .app-container .filter-btn[for="filter-warning"],
+#filter-stable:checked ~ .app-container .filter-btn[for="filter-stable"] {
+  background: #0284c7 !important;
+  border-color: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+/* h-status-badge */
+html.light-theme-active .h-status-badge,
+#toggle-emergency-contrast:checked ~ .app-container .h-status-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+html.light-theme-active .h-status-badge.critical,
+#toggle-emergency-contrast:checked ~ .app-container .h-status-badge.critical {
+  color: #b91c1c !important;
+}
+
+html.light-theme-active .h-status-badge.stable,
+#toggle-emergency-contrast:checked ~ .app-container .h-status-badge.stable {
+  color: #047857 !important;
+}
+
+html.light-theme-active .h-status-badge.warning,
+#toggle-emergency-contrast:checked ~ .app-container .h-status-badge.warning {
+  color: #b45309 !important;
+}
+
+/* Metric values inside h-metrics-row */
+html.light-theme-active .h-metric-val,
+html.light-theme-active .h-metric-label span,
+#toggle-emergency-contrast:checked ~ .app-container .h-metric-val,
+#toggle-emergency-contrast:checked ~ .app-container .h-metric-label span {
+  color: #1e293b !important;
+}
+
+/* Search box icon (search-box-wrap variant used in hospitals.html) */
+html.light-theme-active .search-box-wrap svg,
+#toggle-emergency-contrast:checked ~ .app-container .search-box-wrap svg {
+  color: #475569 !important;
+  stroke: #475569 !important;
+}
+
+/* Action buttons on hospital cards */
+html.light-theme-active .divert-btn,
+#toggle-emergency-contrast:checked ~ .app-container .divert-btn {
+  background: #fff1f2 !important;
+  color: #b91c1c !important;
+  border-color: #fca5a5 !important;
+}
+
+html.light-theme-active .route-btn,
+#toggle-emergency-contrast:checked ~ .app-container .route-btn {
+  background: #0284c7 !important;
+  color: #ffffff !important;
+}
+
+html.light-theme-active .saffron-btn,
+#toggle-emergency-contrast:checked ~ .app-container .saffron-btn {
+  background: #ea580c !important;
+  color: #ffffff !important;
+}
+
+/* Corridor tab active state in light mode */
+#corridor-all:checked ~ .app-container .corridor-tab-label[for="corridor-all"],
+#corridor-gkp:checked ~ .app-container .corridor-tab-label[for="corridor-gkp"],
+#corridor-jaunpur:checked ~ .app-container .corridor-tab-label[for="corridor-jaunpur"] {
+  /* Keep the existing cyan gradient but override for light mode readability */
+}
+
+html.light-theme-active .corridor-tab-label,
+#toggle-emergency-contrast:checked ~ .app-container .corridor-tab-label {
+  color: #1e293b !important;
+}
+
+/* 12. Map Page — HUD Bar, Incident Queue, GIS Pins */
+html.light-theme-active .map-hud-metrics-bar,
+#toggle-emergency-contrast:checked ~ .app-container .map-hud-metrics-bar {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+html.light-theme-active .map-hud-metrics-bar svg,
+#toggle-emergency-contrast:checked ~ .app-container .map-hud-metrics-bar svg {
+  stroke: #475569 !important;
+}
+
+html.light-theme-active .incident-item,
+#toggle-emergency-contrast:checked ~ .app-container .incident-item {
+  background: #f8fafc !important;
+  border-left-width: 4px;
+}
+
+html.light-theme-active .incident-item.p1-critical,
+#toggle-emergency-contrast:checked ~ .app-container .incident-item.p1-critical {
+  background: #fff5f5 !important;
+}
+
+html.light-theme-active .incident-item.p2-warning,
+#toggle-emergency-contrast:checked ~ .app-container .incident-item.p2-warning {
+  background: #fffbeb !important;
+}
+
+html.light-theme-active .inc-priority-tag,
+#toggle-emergency-contrast:checked ~ .app-container .inc-priority-tag {
+  color: #0f172a !important;
+}
+
+html.light-theme-active .inc-priority-tag.p1,
+#toggle-emergency-contrast:checked ~ .app-container .inc-priority-tag.p1 {
+  color: #b91c1c !important;
+}
+
+html.light-theme-active .inc-priority-tag.p2,
+#toggle-emergency-contrast:checked ~ .app-container .inc-priority-tag.p2 {
+  color: #b45309 !important;
+}
+
+html.light-theme-active .inc-desc,
+#toggle-emergency-contrast:checked ~ .app-container .inc-desc {
+  color: #1e293b !important;
+}
+
+html.light-theme-active .inc-route-info,
+html.light-theme-active .inc-time,
+html.light-theme-active .inc-eta,
+#toggle-emergency-contrast:checked ~ .app-container .inc-route-info,
+#toggle-emergency-contrast:checked ~ .app-container .inc-time,
+#toggle-emergency-contrast:checked ~ .app-container .inc-eta {
+  color: #475569 !important;
+}
+
+html.light-theme-active .inc-route-info strong,
+#toggle-emergency-contrast:checked ~ .app-container .inc-route-info strong {
+  color: #0f172a !important;
+}
+
+/* Utility text classes in light mode */
+html.light-theme-active .text-muted,
+#toggle-emergency-contrast:checked ~ .app-container .text-muted {
+  color: #334155 !important;
+}
+
+html.light-theme-active .text-dim,
+#toggle-emergency-contrast:checked ~ .app-container .text-dim {
+  color: #475569 !important;
+}
+
+html.light-theme-active .text-dimmer,
+#toggle-emergency-contrast:checked ~ .app-container .text-dimmer {
+  color: #64748b !important;
+}
+
+html.light-theme-active .text-pure,
+#toggle-emergency-contrast:checked ~ .app-container .text-pure {
+  color: #0f172a !important;
+}
+
+html.light-theme-active .text-main,
+#toggle-emergency-contrast:checked ~ .app-container .text-main {
+  color: #1e293b !important;
+}
+
+/* 13. Telemetry Page — Cryo Tanks, Log Entries, Status Banner & Buttons */
+
+/* Cryo tank module card */
+html.light-theme-active .cryo-tank-module,
+#toggle-emergency-contrast:checked ~ .app-container .cryo-tank-module {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Tank visual (the cylinder) track */
+html.light-theme-active .tank-visual,
+#toggle-emergency-contrast:checked ~ .app-container .tank-visual {
+  background: #e2e8f0 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Tank title */
+html.light-theme-active .tank-title,
+#toggle-emergency-contrast:checked ~ .app-container .tank-title {
+  color: #0f172a !important;
+}
+
+/* Tank pressure text */
+html.light-theme-active .tank-pressure,
+#toggle-emergency-contrast:checked ~ .app-container .tank-pressure {
+  color: #475569 !important;
+}
+
+/* Telemetry log entries — already partially covered, reinforce border colours */
+html.light-theme-active .app-container .telemetry-log-entry.status-ok,
+#toggle-emergency-contrast:checked ~ .app-container .telemetry-log-entry.status-ok {
+  border-left-color: #047857 !important;
+  background: #f0fdf4 !important;
+}
+
+html.light-theme-active .app-container .telemetry-log-entry.status-warn,
+#toggle-emergency-contrast:checked ~ .app-container .telemetry-log-entry.status-warn {
+  border-left-color: #b45309 !important;
+  background: #fffbeb !important;
+}
+
+html.light-theme-active .app-container .telemetry-log-entry.status-alert,
+#toggle-emergency-contrast:checked ~ .app-container .telemetry-log-entry.status-alert {
+  border-left-color: #b91c1c !important;
+  background: #fff5f5 !important;
+}
+
+/* Telemetry source status banner */
+html.light-theme-active .telemetry-source-status,
+#toggle-emergency-contrast:checked ~ .app-container .telemetry-source-status {
+  background: #f0fdf4 !important;
+  border-color: rgba(16, 185, 129, 0.5) !important;
+  color: #047857 !important;
+}
+
+html.light-theme-active .telemetry-source-status.is-stale,
+#toggle-emergency-contrast:checked ~ .app-container .telemetry-source-status.is-stale {
+  background: #fff5f5 !important;
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  color: #b91c1c !important;
+}
+
+/* Export CSV (saffron-btn) — already has override, reinforce border */
+html.light-theme-active .saffron-btn,
+#toggle-emergency-contrast:checked ~ .app-container .saffron-btn {
+  background: #ea580c !important;
+  color: #ffffff !important;
+  border: 1px solid #c2410c !important;
+}
+
+/* Print PDF button border */
+html.light-theme-active .print-pdf-btn,
+#toggle-emergency-contrast:checked ~ .app-container .print-pdf-btn,
+#toggle-emergency-contrast:checked ~ .modal-backdrop .print-pdf-btn {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
 }
 
 /* 5. Print Stylesheet */

@@ -98,11 +98,38 @@
 
 body {
   font-family: var(--font-body);
-  background-color: var(--bg-space);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(6, 182, 212, 0.12), transparent 28rem),
+    radial-gradient(circle at 92% 18%, rgba(255, 153, 51, 0.08), transparent 24rem),
+    var(--bg-space);
   color: var(--text-main);
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand-saffron);
+  outline-offset: 3px;
+}
+
+button,
+label,
+a,
+select,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Utility Type Classes */
